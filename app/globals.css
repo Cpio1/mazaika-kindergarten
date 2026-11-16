@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+@theme {
+  --color-milk: #fbf6ec;
+  --color-paper: #fffdf8;
+  --color-ink: #1d2230;
+  --color-ink-soft: #485066;
+  --color-line: #e7dcc7;
+  --color-hole: #ebdfc9;
+  --color-teal: #0a6967;
+  --color-teal-dark: #075452;
+  --color-turquoise: #22b5a6;
+  --color-turquoise-soft: #d5f1ed;
+  --color-apricot: #f59e6b;
+  --color-apricot-deep: #e57a45;
+  --color-apricot-soft: #fde4d2;
+  --color-sun: #f7c843;
+  --color-sun-soft: #fcefc2;
+  --color-lilac: #b49be0;
+  --color-lilac-soft: #ece4f8;
+
+  --font-sans: var(--font-nunito), "Segoe UI", Arial, sans-serif;
+
+  --breakpoint-nav: 70rem;
+}
+
+:root {
+  color-scheme: only light;
+  --header-h: 64px;
+  --focus: #1d2230;
+}
+
+@media (min-width: 70rem) {
+  :root {
+    --header-h: 76px;
+  }
+}
+
+html {
+  background-color: var(--color-milk);
+  color: var(--color-ink);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+html.scroll-locked {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--color-milk);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: normal;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Заголовок секции встаёт на 16px ниже шапки (компенсируем верхний отступ секции) */
+:root {
+  --sec-pt: 3rem;
+}
+@media (min-width: 40rem) {
+  :root {
+    --sec-pt: 3.5rem;
+  }
+}
+@media (min-width: 64rem) {
+  :root {
+    --sec-pt: 4rem;
+  }
+}
+main section[id]:not(#hero) {
+  scroll-margin-top: calc(var(--header-h) + 16px - var(--sec-pt));
+}
+
+/* Главная деталь мозаики встаёт на место при первом показе */
+@media (prefers-reduced-motion: no-preference) {
+  .mosaic-drop {
+    animation: mosaic-drop 650ms cubic-bezier(0.22, 1.2, 0.36, 1) 300ms both;
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+
+  .menu-enter {
+    animation: menu-enter 200ms ease-out both;
+  }
+
+  .viewer-enter {
+    animation: viewer-enter 180ms ease-out both;
+  }
+}
+
+@keyframes mosaic-drop {
+  from {
+    transform: translateY(-28px) rotate(-8deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes menu-enter {
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes viewer-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+dialog.viewer {
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: rgb(251 246 236 / 0.98);
+  color: var(--color-ink);
+  color-scheme: only light;
+}
+
+dialog.viewer::backdrop {
+  background-color: rgb(251 246 236 / 0.98);
+}
+
+.pegboard {
+  background-image: radial-gradient(circle, var(--color-hole) 1.6px, transparent 2px);
+  background-size: 22px 22px;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Горизонтальное меню или компактная шапка — переключение до появления переноса */
+.hdr-desk {
+  display: none;
+}
+.hdr-mob {
+  display: inline-flex;
+}
+@media (min-width: 70rem) {
+  [data-navsize="4"] .hdr-desk {
+    display: flex;
+  }
+  [data-navsize="4"] .hdr-mob {
+    display: none;
+  }
+}
+@media (min-width: 76rem) {
+  [data-navsize="5"] .hdr-desk {
+    display: flex;
+  }
+  [data-navsize="5"] .hdr-mob {
+    display: none;
+  }
+}
+@media (min-width: 82rem) {
+  [data-navsize="6"] .hdr-desk {
+    display: flex;
+  }
+  [data-navsize="6"] .hdr-mob {
+    display: none;
+  }
+}
+
+/* Последняя секция может встать под шапку, даже если ниже только подвал */
+main > section:last-child {
+  min-height: calc(100svh - var(--header-h) - var(--footer-h, 0px) + var(--sec-pt) - 16px);
+}
