@@ -37,21 +37,43 @@ function petalPath(cx: number, cy: number, len: number, width: number, angleDeg:
 
 /* ───────────── Первый экран: солнце рядом с фото ───────────── */
 
-/** Полукруг, три коротких луча и цветная четверть круга. Четверть — последняя деталь, она встаёт на место. */
-export function HeroSun({ className = "" }: { className?: string }) {
-  const cx = 70;
-  const cy = 76;
+/**
+ * Мозаичный домик под восходящим солнцем: полукруг, три коротких луча и цветная четверть круга.
+ * Четверть круга — последняя деталь, она мягко встаёт на место при загрузке.
+ */
+export function HeroCluster({ className = "" }: { className?: string }) {
+  const cx = 104;
+  const cy = 62;
   const rays = [210, 270, 330].map((deg) => {
     const a = (deg * Math.PI) / 180;
-    return { x1: cx + Math.cos(a) * 52, y1: cy + Math.sin(a) * 52, x2: cx + Math.cos(a) * 66, y2: cy + Math.sin(a) * 66 };
+    return { x1: cx + Math.cos(a) * 43, y1: cy + Math.sin(a) * 43, x2: cx + Math.cos(a) * 55, y2: cy + Math.sin(a) * 55 };
   });
   return (
-    <svg viewBox="0 0 140 120" className={className} {...svgProps}>
+    <svg viewBox="0 0 160 176" className={className} {...svgProps}>
       {rays.map((r, i) => (
-        <line key={i} {...r} stroke={C.apricot} strokeWidth="10" strokeLinecap="round" />
+        <line key={i} {...r} stroke={C.apricot} strokeWidth="9" strokeLinecap="round" />
       ))}
-      <path d={`M${cx - 42} ${cy} A42 42 0 0 1 ${cx + 42} ${cy}Z`} fill={C.sun} />
-      <path className="mosaic-drop" d={`M${cx + 42} ${cy + 6} V${cy + 40} A34 34 0 0 1 ${cx + 8} ${cy + 6}Z`} fill={C.turquoise} />
+      <path d={`M${cx - 34} ${cy} A34 34 0 0 1 ${cx + 34} ${cy}Z`} fill={C.sun} />
+      <rect x="18" y="116" width="70" height="54" rx="6" fill={C.turquoise} />
+      <path d="M8 120 L53 82 L98 120Z" fill={C.apricotDeep} stroke={C.apricotDeep} strokeWidth="9" strokeLinejoin="round" />
+      <path d="M42 170 V150 A11 11 0 0 1 64 150 V170Z" fill={C.sun} />
+      <circle cx="75" cy="136" r="7" fill={C.lilac} />
+      <path className="mosaic-drop" d={`M${cx + 34} ${cy + 6} V${cy + 34} A28 28 0 0 1 ${cx + 6} ${cy + 6}Z`} fill={C.teal} />
+    </svg>
+  );
+}
+
+/** Волнистый край секции. Рисуется цветом самой секции и выступает над её верхней или нижней границей. */
+export function Wave({ fill, className = "", flip = false }: { fill: string; className?: string; flip?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 1440 40"
+      preserveAspectRatio="none"
+      className={className}
+      style={flip ? { transform: "scaleY(-1)" } : undefined}
+      {...svgProps}
+    >
+      <path d="M0 40 V24 C 180 4 360 2 540 18 S 900 38 1080 20 S 1320 2 1440 14 V40Z" fill={fill} />
     </svg>
   );
 }
@@ -109,21 +131,35 @@ export function CloudShape({ className = "" }: { className?: string }) {
 
 /* ───────────── Питание ───────────── */
 
-/** Тарелка-полукруг и пять цветных зёрен по краю — визуальный счёт. */
+/** Тарелка-полукруг с узором и пять маленьких цветных деталей по ободу — визуальный счёт. */
 export function PlateGrains({ className = "" }: { className?: string }) {
   const cx = 110;
-  const cy = 22;
-  const grains = [C.turquoise, C.apricotDeep, C.sun, C.lilac, C.teal];
+  const cy = 18;
+  const pieces = [C.turquoise, C.apricotDeep, C.sun, C.lilac, C.teal];
   return (
-    <svg viewBox="0 0 220 122" className={className} {...svgProps}>
-      <path d={`M${cx - 98} ${cy} A98 98 0 0 0 ${cx + 98} ${cy}Z`} fill={C.board} stroke={C.boardLine} strokeWidth="3" />
-      <path d={`M${cx - 58} ${cy} A58 58 0 0 0 ${cx + 58} ${cy}Z`} fill={C.sunSoft} />
-      {grains.map((col, i) => {
+    <svg viewBox="0 0 220 124" className={className} {...svgProps}>
+      <rect x="4" y="8" width="212" height="14" rx="7" fill={C.apricot} />
+      <path d={`M${cx - 100} ${cy} A100 100 0 0 0 ${cx + 100} ${cy}Z`} fill={C.board} stroke={C.boardLine} strokeWidth="3" />
+      <path d={`M${cx - 62} ${cy} A62 62 0 0 0 ${cx + 62} ${cy}Z`} fill={C.sunSoft} />
+      <path
+        d={`M${cx - 46} ${cy} A46 46 0 0 0 ${cx + 46} ${cy}`}
+        fill="none"
+        stroke={C.apricot}
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeDasharray="0.1 11"
+      />
+      <path d={`M${cx - 22} ${cy} A22 22 0 0 0 ${cx + 22} ${cy}Z`} fill={C.sunLight} />
+      {pieces.map((col, i) => {
         const deg = 160 - i * 35;
         const a = (deg * Math.PI) / 180;
-        const x = cx + Math.cos(a) * 78;
-        const y = cy + Math.sin(a) * 78;
-        return <ellipse key={i} cx={x} cy={y} rx="12" ry="7" transform={`rotate(${deg + 90} ${x} ${y})`} fill={col} />;
+        const x = cx + Math.cos(a) * 81;
+        const y = cy + Math.sin(a) * 81;
+        return i % 2 === 0 ? (
+          <circle key={i} cx={x} cy={y} r="8.5" fill={col} />
+        ) : (
+          <ellipse key={i} cx={x} cy={y} rx="12" ry="7" transform={`rotate(${deg + 90} ${x} ${y})`} fill={col} />
+        );
       })}
     </svg>
   );
@@ -178,21 +214,52 @@ export function DanceSteps({ className = "" }: { className?: string }) {
 
 /* ───────────── Контакты ───────────── */
 
-/** Короткая пунктирная дорожка к метке на карте. */
-export function MapTrail({ className = "" }: { className?: string }) {
+/** Небольшая карта: кварталы, дороги, пунктирная дорожка к мозаичному домику. */
+export function MapScene({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 220 150" className={className} {...svgProps}>
-      <circle cx="18" cy="130" r="9" fill={C.sun} />
+    <svg viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice" className={className} {...svgProps}>
+      <rect width="320" height="220" fill={C.board} />
+      <rect x="14" y="14" width="150" height="96" rx="20" fill="#d5f1ed" />
+      <rect x="232" y="14" width="74" height="104" rx="20" fill="#ece4f8" />
+      <circle cx="56" cy="186" r="40" fill={C.sunSoft} />
+      <rect x="236" y="160" width="70" height="52" rx="18" fill="#fde4d2" />
+      <path d="M-10 140 C 80 124, 150 160, 330 120" fill="none" stroke={C.milk} strokeWidth="20" strokeLinecap="round" />
+      <path d="M200 -10 C 190 80, 222 150, 212 230" fill="none" stroke={C.milk} strokeWidth="16" strokeLinecap="round" />
       <path
-        d="M30 128 C 70 128, 74 84, 112 92 S 150 98, 162 78"
+        d="M58 182 C 96 170, 120 144, 166 140 S 236 128, 252 98"
         fill="none"
         stroke={C.teal}
         strokeWidth="6"
         strokeLinecap="round"
         strokeDasharray="0.1 14"
       />
-      <path d="M178 82 C 160 60, 154 48, 154 36 A24 24 0 0 1 202 36 C 202 48, 196 60, 178 82Z" fill={C.apricotDeep} />
-      <circle cx="178" cy="36" r="9" fill={C.milk} />
+      <circle cx="56" cy="184" r="9" fill={C.sun} />
+      <rect x="250" y="66" width="40" height="30" rx="4" fill={C.turquoise} />
+      <path d="M244 70 L270 46 L296 70Z" fill={C.apricotDeep} stroke={C.apricotDeep} strokeWidth="7" strokeLinejoin="round" />
+      <path d="M264 96 V86 A6 6 0 0 1 276 86 V96Z" fill={C.sun} />
+    </svg>
+  );
+}
+
+/** Цветная лента — мотив хореографии. */
+export function Ribbon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 240 40" preserveAspectRatio="none" className={className} {...svgProps}>
+      <path d="M6 22 C 46 2, 86 42, 126 22 S 196 2, 234 20" fill="none" stroke={C.apricot} strokeWidth="9" strokeLinecap="round" />
+      <path d="M6 32 C 46 12, 86 52, 126 32 S 196 12, 234 30" fill="none" stroke={C.lilac} strokeWidth="5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Фон заголовка в виде речевого облака (растягивается по размеру заголовка). */
+export function CloudBg({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 200 100" preserveAspectRatio="none" className={className} {...svgProps}>
+      <path
+        d="M30 80 C 6 80 2 54 20 46 C 12 22 42 8 60 22 C 70 4 108 2 120 20 C 138 6 172 12 172 36 C 196 40 198 76 172 80Z"
+        fill={C.lilac}
+      />
+      <path d="M38 78 L24 98 L64 79Z" fill={C.lilac} />
     </svg>
   );
 }

@@ -5,22 +5,29 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import type { Photo } from "@/lib/media";
 import { ChevronIcon, CloseIcon } from "./icons";
-import { ShapeMark, mosaicColors } from "./Mosaic";
+import { ShapeMark, Wave, mosaicColors } from "./Mosaic";
 
 const MOBILE_INITIAL = 4;
 const DESKTOP_INITIAL = 6;
-/** Форма миниатюры: из настройки thumb или по исходным пропорциям снимка. */
+const DESKTOP_QUERY = "(min-width: 1024px)";
+
+/** Форма кадра: из настройки thumb или по исходным пропорциям снимка. */
 function shapeOf(p: Photo): "tall" | "wide" {
   return p.thumb ?? (p.width >= p.height ? "wide" : "tall");
 }
 
-/** Вертикальные кадры — арка на две строки, горизонтальные — широкая плитка с одним скруглённым углом. */
-function tileClass(p: Photo, i: number, single: boolean) {
+/**
+ * Раскладка кадра. Телефон: общая сетка в две колонки (вертикальный кадр — на две строки).
+ * Ноутбук: разворот альбома — левая и правая страницы со своей сеткой.
+ */
+function tileLayout(p: Photo, aloneOnPage: boolean) {
   const tall = shapeOf(p) === "tall";
-  if (single) return tall ? "aspect-[3/4] max-w-sm rounded-t-full rounded-b-[1.5rem]" : "aspect-[4/3] max-w-2xl rounded-[1.5rem] rounded-tr-[5rem]";
-  if (tall) return "h-full rounded-t-full rounded-b-[1.25rem]";
-  return `h-full md:col-span-2 rounded-[1.25rem] ${i % 2 ? "rounded-bl-[4rem]" : "rounded-tr-[4rem]"}`;
+  const mobile = tall ? "row-span-2" : "";
+  if (aloneOnPage) return `${mobile} lg:col-span-2 lg:row-span-2 lg:items-center`;
+  return tall ? `${mobile} lg:row-span-2` : "lg:col-span-2 lg:row-span-1";
 }
+
+const corners = ["bg-teal", "bg-apricot-deep", "bg-lilac"];
 
 export function Gallery({ locale, photos }: { locale: Locale; photos: Photo[] }) {
   const t = getDictionary(locale);
@@ -82,56 +89,88 @@ export function Gallery({ locale, photos }: { locale: Locale; photos: Photo[] })
   };
 
   const expand = () => {
-    const first = window.matchMedia("(min-width: 768px)").matches ? DESKTOP_INITIAL : MOBILE_INITIAL;
+    const first = window.matchMedia(DESKTOP_QUERY).matches ? DESKTOP_INITIAL : MOBILE_INITIAL;
     setExpanded(true);
     requestAnimationFrame(() => thumbs.current[first]?.focus({ preventScroll: true }));
   };
 
-  const moreVisibility = n > DESKTOP_INITIAL ? "" : "md:hidden";
+  const moreVisibility = n > DESKTOP_INITIAL ? "" : "lg:hidden";
   const current = index !== null ? photos[index] : null;
+  const half = n > 1 ? Math.floor(n / 2) : 1;
+  const pages = [photos.slice(0, half).map((p, k) => ({ p, i: k })), photos.slice(half).map((p, k) => ({ p, i: half + k }))].filter(
+    (page) => page.length > 0,
+  );
 
   return (
-    <section id="gallery" aria-labelledby="gallery-title" className="relative bg-milk">
-      <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+    <section id="gallery" aria-labelledby="gallery-title" className="relative overflow-x-clip bg-lilac-soft">
+      <Wave fill="#ece4f8" className="pointer-events-none absolute inset-x-0 bottom-full block h-5 w-full sm:h-8" />
+      <div className="mx-auto w-full max-w-7xl px-4 pt-12 pb-14 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16 lg:pb-16">
         <h2 id="gallery-title" className="flex items-start gap-2 text-[min(1.9rem,9vw)] leading-tight font-extrabold [overflow-wrap:anywhere] text-ink sm:text-4xl lg:text-[2.75rem]">
           {t.gallery.title}
           <ShapeMark shape="petal" color={mosaicColors.apricot} className="mt-0.5 size-5 shrink-0 sm:size-6" />
         </h2>
+        <p className="mt-3 max-w-4xl text-[1.05rem] leading-relaxed text-ink-soft sm:text-lg">{t.gallery.intro}</p>
 
-        <ul
-          className={
-            n === 1
-              ? "mt-6"
-              : "mt-6 grid max-w-3xl grid-flow-dense auto-rows-[9rem] grid-cols-2 gap-3 sm:auto-rows-[12rem] sm:gap-4 md:grid-cols-3 lg:auto-rows-[12.5rem]"
-          }
-        >
-          {photos.map((p, i) => {
-            const hidden =
-              expanded || i < MOBILE_INITIAL ? "" : i < DESKTOP_INITIAL ? "hidden md:block" : "hidden";
-            return (
-              <li key={p.src} className={`${hidden} ${n > 1 && shapeOf(p) === "tall" ? "row-span-2" : ""} ${n > 1 && shapeOf(p) === "wide" ? "md:col-span-2" : ""}`}>
-                <button
-                  ref={(el) => {
-                    thumbs.current[i] = el;
-                  }}
-                  type="button"
-                  onClick={() => show(i)}
-                  aria-label={`${t.gallery.open(i + 1)}: ${p.alt[locale]}`}
-                  className={`relative block w-full overflow-hidden bg-paper ${tileClass(p, i, n === 1)}`}
-                >
-                  <Image
-                    src={p.src}
-                    alt=""
-                    fill
-                    sizes={shapeOf(p) === "wide" ? "(min-width: 768px) 512px, 50vw" : "(min-width: 768px) 256px, 50vw"}
-                    className="object-cover"
-                    style={{ objectPosition: p.position ?? "50% 40%" }}
-                  />
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        {/* Раскрытый фотоальбом: бумажные уголки у снимков, цветные закладки по краю */}
+        <div className="relative mt-8 max-w-5xl rounded-[1.25rem] bg-paper p-3 shadow-[0_18px_36px_-26px_rgb(29_34_48/0.55)] sm:rounded-[1.75rem] sm:p-5 lg:p-8">
+          <span aria-hidden="true" className="pointer-events-none absolute -top-5 right-8 h-7 w-4 bg-teal [clip-path:polygon(0_0,100%_0,100%_100%,50%_78%,0_100%)] sm:right-14" />
+          <span aria-hidden="true" className="pointer-events-none absolute -top-4 right-14 h-6 w-4 bg-sun [clip-path:polygon(0_0,100%_0,100%_100%,50%_78%,0_100%)] sm:right-21" />
+          <span aria-hidden="true" className="pointer-events-none absolute top-16 -right-2 h-4 w-3 rounded-r-sm bg-apricot sm:-right-3 sm:w-4" />
+          {pages.length > 1 && (
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-6 left-1/2 hidden w-10 -translate-x-1/2 bg-gradient-to-r from-transparent via-line to-transparent lg:block"
+            />
+          )}
+
+          <div
+            className={
+              n === 1
+                ? "mx-auto max-w-sm"
+                : "grid grid-flow-dense auto-rows-[10rem] grid-cols-2 gap-3 sm:auto-rows-[13rem] sm:gap-4 lg:auto-rows-auto lg:gap-x-14"
+            }
+          >
+            {pages.map((page, pi) => (
+              <ul key={pi} className={n === 1 ? "" : "contents lg:grid lg:auto-rows-[11.5rem] lg:grid-cols-2 lg:content-start lg:gap-4"}>
+                {page.map(({ p, i }) => {
+                  const hidden = expanded || i < MOBILE_INITIAL ? "flex" : i < DESKTOP_INITIAL ? "hidden lg:flex" : "hidden";
+                  const alone = page.length === 1 && n > 1;
+                  const caption = p.caption?.[locale];
+                  const corner = corners[i % corners.length];
+                  return (
+                    <li key={p.src} className={`${hidden} min-h-0 flex-col ${n === 1 ? "" : tileLayout(p, alone)}`}>
+                      <button
+                        ref={(el) => {
+                          thumbs.current[i] = el;
+                        }}
+                        type="button"
+                        onClick={() => show(i)}
+                        aria-label={`${t.gallery.open(i + 1)}: ${p.alt[locale]}`}
+                        className={`relative block min-h-0 w-full rounded-md bg-paper p-2 shadow-[0_6px_16px_-10px_rgb(29_34_48/0.55)] ring-1 ring-line sm:p-2.5 ${
+                          n === 1 ? (shapeOf(p) === "tall" ? "aspect-[3/4]" : "aspect-[4/3]") : `flex-1 ${alone && shapeOf(p) === "tall" ? "lg:aspect-[3/4] lg:w-auto" : ""}`
+                        }`}
+                      >
+                        <span className="relative block size-full overflow-hidden rounded-sm bg-milk">
+                          <Image
+                            src={p.src}
+                            alt=""
+                            fill
+                            sizes={shapeOf(p) === "wide" ? "(min-width: 1024px) 460px, 50vw" : "(min-width: 1024px) 320px, 50vw"}
+                            className="object-cover"
+                            style={{ objectPosition: p.position ?? "50% 40%" }}
+                          />
+                        </span>
+                        <span aria-hidden="true" className={`pointer-events-none absolute -top-1 -left-1 size-3 [clip-path:polygon(0_0,100%_0,0_100%)] sm:-top-1.5 sm:-left-1.5 sm:size-4 ${corner}`} />
+                        <span aria-hidden="true" className={`pointer-events-none absolute -right-1 -bottom-1 size-3 [clip-path:polygon(100%_0,100%_100%,0_100%)] sm:-right-1.5 sm:-bottom-1.5 sm:size-4 ${corner}`} />
+                      </button>
+                      {caption && <p className="mt-1.5 line-clamp-2 text-sm leading-snug font-semibold text-ink-soft sm:text-base">{caption}</p>}
+                    </li>
+                  );
+                })}
+              </ul>
+            ))}
+          </div>
+        </div>
 
         {!expanded && n > MOBILE_INITIAL && (
           <button

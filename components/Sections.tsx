@@ -5,24 +5,24 @@ import { getDictionary, type Locale } from "@/lib/i18n";
 import { aboutMedia, heroPhoto, logo } from "@/lib/media";
 import { mapUrl, site, whatsappUrl } from "@/lib/site";
 import { ClockIcon, DocIcon, ExternalIcon, PhoneIcon, PinIcon } from "./icons";
-import {
-  CloudShape,
-  DanceSteps,
-  HeroSun,
-  MapTrail,
-  MosaicScene,
-  PlateGrains,
-  ShapeMark,
-  SpeechPair,
-  mosaicColors as C,
-} from "./Mosaic";
+import { CloudBg, DanceSteps, HeroCluster, MapScene, MosaicScene, PlateGrains, Ribbon, Wave, mosaicColors as C } from "./Mosaic";
 
 const container = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
+/** Верхний отступ секций с якорями согласован с --sec-pt в globals.css. */
+const sectionPad = "pt-12 sm:pt-14 lg:pt-16";
 const h2Class = "text-[min(1.9rem,9vw)] leading-tight font-extrabold [overflow-wrap:anywhere] text-ink sm:text-4xl lg:text-[2.75rem]";
+const bodyText = "text-[1.05rem] leading-relaxed text-ink-soft sm:text-lg";
 const btnPrimary =
   "inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-teal px-6 text-lg font-bold text-white shadow-[0_6px_0_-1px_#075452] transition-[background-color,transform,box-shadow] duration-200 hover:bg-teal-dark active:translate-y-0.5 active:shadow-[0_3px_0_-1px_#075452]";
 const btnSecondary =
   "inline-flex min-h-13 items-center justify-center gap-2 rounded-full border-2 border-teal bg-paper px-6 text-lg font-bold text-teal transition-colors duration-200 hover:bg-turquoise-soft";
+const textLink =
+  "inline-flex min-h-11 items-center gap-2 font-bold text-teal underline decoration-2 underline-offset-4 transition-colors duration-200 hover:text-teal-dark";
+
+/** Волна над секцией, нарисованная цветом этой секции. */
+function TopWave({ fill }: { fill: string }) {
+  return <Wave fill={fill} className="pointer-events-none absolute inset-x-0 bottom-full block h-5 w-full sm:h-8" />;
+}
 
 function address(locale: Locale) {
   const a = site.address[locale];
@@ -33,65 +33,47 @@ function address(locale: Locale) {
 
 export function Hero({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
-  const facts = [
-    { label: t.hero.ageLabel, value: t.hero.age, shape: "circle" as const, color: C.turquoise },
-    { label: t.hero.languageLabel, value: t.hero.language, shape: "arch" as const, color: C.apricot },
-    { label: t.hero.hoursLabel, value: site.hours, shape: "petal" as const, color: C.lilac },
-  ];
+  const { before, brand, after } = t.hero.titleParts;
   return (
-    <section id="hero" aria-labelledby="hero-title" className="relative overflow-clip bg-milk">
+    <section id="hero" aria-labelledby="hero-title" className="relative overflow-x-clip bg-milk">
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-40 -bottom-56 hidden size-[36rem] rounded-full bg-sun-soft/60 lg:block"
-      />
-      <div
-        className={`${container} relative grid gap-8 pt-6 pb-10 sm:pt-8 md:pb-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-12 lg:pt-12 lg:pb-16`}
+        className={`${container} relative grid gap-8 pt-6 pb-14 sm:pt-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-12 lg:pt-10 lg:pb-20`}
       >
-        <div className="min-w-0 lg:max-w-[36rem]">
-          <h1
-            id="hero-title"
-            className="text-[min(2.05rem,10.5vw)] leading-[1.08] font-extrabold tracking-tight [overflow-wrap:anywhere] text-ink min-[400px]:text-[min(2.35rem,10.5vw)] sm:text-5xl lg:text-[3.4rem] xl:text-[3.6rem]"
-          >
-            {t.hero.title}
+        <div className="min-w-0 lg:max-w-[38rem]">
+          <h1 id="hero-title" className="text-ink">
+            {before && <span className="block text-xl font-extrabold text-teal sm:text-2xl">{before}</span>}{" "}
+            <span className="block text-[min(3.6rem,16vw)] leading-[0.95] font-black tracking-tight sm:text-7xl lg:text-[5.5rem]">
+              {brand.slice(0, 2)}
+              <span className="text-teal">{brand.slice(2, 3)}</span>
+              {brand.slice(3)}
+            </span>{" "}
+            {after && (
+              <span className="mt-1 block text-[min(1.9rem,8.5vw)] leading-tight font-extrabold sm:text-4xl">{after}</span>
+            )}
           </h1>
-          <p className="mt-3 max-w-[34rem] text-[1.05rem] leading-relaxed text-ink-soft sm:mt-4 sm:text-lg lg:text-xl">
-            {t.hero.lead}
-          </p>
+          <p className={`mt-4 max-w-[36rem] sm:mt-5 lg:text-xl ${bodyText}`}>{t.hero.lead.join(" ")}</p>
 
-          <dl className="mt-4 grid max-w-[34rem] gap-1.5 sm:mt-6 sm:grid-cols-3 sm:gap-4">
-            {facts.map((f) => (
-              <div
-                key={f.label}
-                className="flex min-w-0 flex-wrap items-baseline gap-x-2 sm:block sm:border-l-2 sm:border-line sm:pl-4 sm:first:border-l-0 sm:first:pl-0"
-              >
-                <dt className="flex shrink-0 items-center gap-1.5 text-[0.95rem] leading-tight font-semibold text-ink-soft sm:text-sm">
-                  <ShapeMark shape={f.shape} color={f.color} className="size-3 shrink-0" />
-                  <span>
-                    {f.label}
-                    <span className="sm:hidden" aria-hidden="true">:</span>
-                  </span>
-                </dt>
-                <dd className="text-[1.05rem] leading-tight font-extrabold whitespace-nowrap text-ink sm:mt-1 sm:text-lg lg:text-xl">{f.value}</dd>
-              </div>
-            ))}
-          </dl>
-
-          <div className="mt-6 flex flex-col gap-3 min-[480px]:flex-row min-[480px]:flex-wrap sm:mt-8">
+          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3 sm:mt-8">
             <a href={site.phone.href} aria-label={t.callAria} className={btnPrimary}>
               <PhoneIcon />
               {t.call}
             </a>
-            <a href="#contacts" className={btnSecondary}>
-              <PinIcon />
-              {t.hero.address}
-            </a>
+            <p className="inline-flex min-h-11 items-center gap-2 rounded-full bg-sun-soft py-1.5 pr-5 pl-3.5 text-ink">
+              <ClockIcon className="size-5 shrink-0 text-teal" />
+              <span className="text-sm font-semibold text-ink-soft">{t.hero.hoursLabel}</span>
+              <span className="text-lg font-extrabold whitespace-nowrap">{site.hours}</span>
+            </p>
           </div>
+          <a href="#contacts" className={`mt-3 ${textLink}`}>
+            <PinIcon className="size-5" />
+            {t.hero.route}
+          </a>
         </div>
 
         {heroPhoto ? (
-          <div className="flex items-start justify-center gap-3 sm:gap-5 lg:justify-end">
-            <HeroSun className="mt-2 h-auto w-20 shrink-0 sm:w-28 lg:mt-8 lg:w-28 xl:w-36" />
-            <div className="relative aspect-[4/5] w-[min(14.5rem,58vw)] shrink-0 overflow-hidden rounded-t-full rounded-b-[1.75rem] border-[6px] border-paper bg-paper shadow-[0_20px_40px_-24px_rgb(29_34_48/0.45)] sm:w-[17rem] lg:aspect-[3/4] lg:w-[18rem] xl:w-[21rem]">
+          <div className="flex items-end justify-center gap-3 sm:gap-5 lg:justify-end">
+            <HeroCluster className="h-auto w-24 shrink-0 sm:w-32 xl:w-40" />
+            <div className="relative aspect-[4/5] w-[min(14.5rem,56vw)] shrink-0 overflow-hidden rounded-t-full rounded-b-[1.75rem] border-[6px] border-paper bg-paper shadow-[0_20px_40px_-24px_rgb(29_34_48/0.45)] sm:w-[17rem] lg:aspect-[3/4] lg:w-[18rem] xl:w-[21rem]">
               <Image
                 src={heroPhoto.src}
                 alt={heroPhoto.alt[locale] || t.hero.photoAlt}
@@ -120,64 +102,79 @@ export function Hero({ locale }: { locale: Locale }) {
 
 /* ───────────────────────── О садике и группах ───────────────────────── */
 
+/** Единая иллюстрация: круглая деталь конструктора с цифрой 3, арка с возрастом, речевое облако «Қазақша». */
+function GroupsIllustration({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale);
+  const caption = "mt-1.5 block text-center text-sm leading-tight font-semibold text-ink-soft";
+  const studs = [0, 60, 120, 180, 240, 300];
+  return (
+    <div role="img" aria-label={t.about.illustrationLabel} className="mt-8 flex max-w-[30rem] flex-wrap items-end gap-x-2.5 gap-y-4 sm:gap-x-5">
+      <div className="flex w-20 flex-col items-center sm:w-28">
+        <div className="relative flex size-20 items-center justify-center rounded-full bg-teal shadow-[inset_0_-6px_0_rgb(0_0_0/0.16)] [--r:1.95rem] sm:size-28 sm:[--r:2.75rem]">
+          {studs.map((deg) => (
+            <span
+              key={deg}
+              aria-hidden="true"
+              className="absolute inset-0 m-auto size-2 rounded-full bg-milk/35 sm:size-2.5"
+              style={{ transform: `rotate(${deg}deg) translateY(calc(-1 * var(--r)))` }}
+            />
+          ))}
+          <span className="text-[2.75rem] leading-none font-black text-milk sm:text-6xl">{site.groups}</span>
+        </div>
+        <span className={caption}>{t.about.groupsCaption}</span>
+      </div>
+
+      <div className="flex h-[6.25rem] w-[5.5rem] flex-col items-center justify-end rounded-t-full bg-apricot pb-2.5 sm:h-32 sm:w-28 sm:pb-3.5">
+        <span className="text-2xl leading-none font-black whitespace-nowrap text-ink sm:text-[2rem]">{t.about.ageValue}</span>
+        <span className="mt-0.5 text-base font-extrabold text-ink sm:text-lg">{t.about.ageUnit}</span>
+      </div>
+
+      <div className="mb-3 flex w-32 flex-col items-center sm:mb-6 sm:w-40">
+        <div className="relative flex h-[4.75rem] w-full items-center justify-center sm:h-24">
+          <CloudBg className="absolute inset-0 size-full" />
+          <span lang="kk" className="relative -mt-2 text-lg font-extrabold text-ink sm:text-xl">
+            {t.about.langWord}
+          </span>
+        </div>
+        <span className={caption}>{t.about.langCaption}</span>
+      </div>
+    </div>
+  );
+}
+
 export function About({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
-  const unit = "block text-2xl leading-tight font-extrabold text-ink sm:text-[1.75rem]";
-  const label = "block text-base font-semibold text-ink-soft";
   return (
-    <section id="about" aria-labelledby="about-title" className="relative overflow-clip border-y border-line bg-paper">
+    <section id="about" aria-labelledby="about-title" className="relative overflow-x-clip bg-paper">
+      <TopWave fill={C.board} />
       <div
-        className={`${container} grid gap-6 py-12 sm:gap-8 sm:py-14 lg:pt-16 lg:pb-18 ${aboutMedia ? "lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-14" : ""}`}
+        className={`${container} grid gap-8 pb-14 ${sectionPad} lg:pb-20 ${aboutMedia ? "lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-14" : ""}`}
       >
         <div className="min-w-0">
           <h2 id="about-title" className={h2Class}>
             {t.about.title}
           </h2>
-          <p className="mt-3 max-w-2xl text-lg leading-relaxed text-ink-soft">{t.about.lead}</p>
-
-          {/* Одна композиция на общем фоне: круг, арка и речевое облако разного размера */}
-          <ul
-            className={`mt-6 grid gap-4 rounded-[2rem] bg-milk p-5 sm:gap-5 sm:p-7 lg:mt-8 ${aboutMedia ? "lg:max-w-xl" : "md:grid-cols-3 md:items-center md:rounded-[3rem]"}`}
-          >
-            <li className="flex items-center gap-4 sm:gap-5">
-              <span className="flex size-16 shrink-0 items-center justify-center rounded-full bg-teal text-[2rem] font-extrabold text-milk sm:size-20 sm:text-[2.5rem]">
-                {site.groups}
-              </span>
-              <span className="min-w-0 [overflow-wrap:anywhere]">
-                <span className={unit}>{t.about.groupsUnit}</span>
-                <span className={label}>{t.about.groupsLabel}</span>
-              </span>
-            </li>
-            <li className={`flex items-center gap-4 sm:gap-5 ${aboutMedia ? "lg:ml-14" : ""}`}>
-              <span className="flex h-16 w-[4.75rem] shrink-0 items-end justify-center rounded-t-full bg-apricot pb-2 text-xl font-extrabold whitespace-nowrap text-ink sm:h-20 sm:w-24 sm:pb-3 sm:text-2xl">
-                {site.ageFrom}–{site.ageTo}
-              </span>
-              <span className="min-w-0 [overflow-wrap:anywhere]">
-                <span className={unit}>{t.about.ageUnit}</span>
-                <span className={label}>{t.about.ageLabel}</span>
-              </span>
-            </li>
-            <li className={`flex items-center gap-4 sm:gap-5 ${aboutMedia ? "lg:ml-6" : ""}`}>
-              <span aria-hidden="true" className="relative flex h-[3.75rem] w-[4.75rem] shrink-0 items-center justify-center sm:h-[4.25rem] sm:w-[5.5rem]">
-                <CloudShape className="absolute inset-0 size-full" />
-                <span className="relative -mt-1.5 text-xl font-extrabold text-ink sm:text-2xl">Әә</span>
-              </span>
-              <span className="min-w-0 [overflow-wrap:anywhere]">
-                <span className={unit}>{t.about.langValue}</span>
-                <span className={label}>{t.about.langLabel}</span>
-              </span>
-            </li>
-          </ul>
+          <h3 className="mt-2 text-xl font-extrabold text-teal sm:text-2xl">{t.about.subtitle}</h3>
+          {t.about.text.map((para) => (
+            <p key={para} className={`mt-3 max-w-2xl ${bodyText}`}>
+              {para}
+            </p>
+          ))}
+          <a href={site.phone.href} className={`mt-2 ${textLink}`}>
+            <PhoneIcon className="size-5" />
+            {t.about.callLink}: {site.phone.display}
+          </a>
+          <GroupsIllustration locale={locale} />
         </div>
 
         {aboutMedia &&
           (aboutMedia.kind === "image" ? (
-            <div className="relative mx-auto aspect-[16/10] w-full max-w-md overflow-hidden rounded-tl-[5rem] rounded-tr-[1.25rem] rounded-br-[5rem] rounded-bl-[1.25rem] bg-milk lg:aspect-[3/4] lg:w-[19rem] lg:max-w-none lg:rounded-tl-[7rem] lg:rounded-br-[7rem]">
+            <div className="relative mx-auto aspect-[16/10] w-full max-w-md overflow-hidden rounded-tl-[5rem] rounded-tr-[1.25rem] rounded-br-[5rem] rounded-bl-[1.25rem] bg-milk lg:aspect-[4/5] lg:max-w-[22rem] lg:rounded-tl-[7rem] lg:rounded-br-[7rem]">
               <Image
                 src={aboutMedia.src}
                 alt={aboutMedia.alt[locale]}
                 fill
-                sizes="(min-width: 1024px) 304px, (min-width: 448px) 448px, 92vw"
+                sizes="(min-width: 1024px) 352px, (min-width: 448px) 448px, 92vw"
                 className="object-cover"
                 style={{ objectPosition: aboutMedia.position ?? "50% 50%" }}
               />
@@ -191,7 +188,7 @@ export function About({ locale }: { locale: Locale }) {
               width={aboutMedia.width}
               height={aboutMedia.height}
               aria-label={aboutMedia.label[locale]}
-              className="mx-auto h-auto max-h-[70svh] w-full max-w-md rounded-tl-[5rem] rounded-tr-[1.25rem] rounded-br-[5rem] rounded-bl-[1.25rem] bg-ink/5 object-contain lg:w-[19rem]"
+              className="mx-auto h-auto max-h-[70svh] w-full max-w-md rounded-tl-[5rem] rounded-tr-[1.25rem] rounded-br-[5rem] rounded-bl-[1.25rem] bg-ink/5 object-contain lg:max-w-[22rem]"
             >
               <source src={aboutMedia.src} type={aboutMedia.type} />
             </video>
@@ -206,19 +203,26 @@ export function About({ locale }: { locale: Locale }) {
 export function Food({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   return (
-    <section id="food" aria-labelledby="food-title" className="relative overflow-clip bg-milk">
-      <div className={`${container} flex items-center gap-4 py-12 sm:gap-8 sm:py-14 lg:gap-12 lg:py-16`}>
-        <PlateGrains className="h-auto w-28 shrink-0 sm:w-44 lg:w-64" />
-        <div className="min-w-0">
-          <p className="text-base font-bold text-teal sm:text-lg">{t.food.title}</p>
-          <h2
-            id="food-title"
-            className="mt-1 text-[min(2rem,8.5vw)] leading-[1.1] font-extrabold [overflow-wrap:anywhere] text-ink sm:text-5xl lg:text-[3.25rem]"
-          >
+    <section id="food" aria-labelledby="food-title" className="relative z-10 overflow-x-clip bg-sun-soft">
+      <TopWave fill={C.sunSoft} />
+      <Wave fill={C.sunSoft} flip className="pointer-events-none absolute inset-x-0 top-full block h-5 w-full sm:h-8" />
+      <div
+        className={`${container} grid grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-x-4 gap-y-4 pb-12 ${sectionPad} sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-16 lg:gap-y-3 lg:pb-16`}
+      >
+        <div className="col-start-2 row-start-1 min-w-0 lg:col-start-1 lg:self-end">
+          <p className="text-base font-bold text-ink-soft sm:text-lg">{t.food.title}</p>
+          <h2 id="food-title" className={`mt-1 ${h2Class}`}>
             {t.food.headline}
           </h2>
-          <p className="mt-2 text-lg leading-relaxed text-ink-soft">{t.food.text}</p>
         </div>
+        <div className="col-span-2 row-start-2 min-w-0 lg:col-span-1 lg:col-start-1 lg:self-start">
+          <p className={`max-w-2xl ${bodyText} text-ink`}>{t.food.text}</p>
+          <a href={site.phone.href} aria-label={t.food.menuLinkAria} className={`mt-2 ${textLink}`}>
+            <PhoneIcon className="size-5" />
+            {t.food.menuLink}
+          </a>
+        </div>
+        <PlateGrains className="col-start-1 row-start-1 h-auto w-full lg:col-start-2 lg:row-span-2 lg:w-80 xl:w-96" />
       </div>
     </section>
   );
@@ -228,27 +232,30 @@ export function Food({ locale }: { locale: Locale }) {
 
 export function Activities({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
-  const items = [
-    { title: t.activities.speechTitle, text: t.activities.speechText, Figure: SpeechPair },
-    { title: t.activities.danceTitle, text: t.activities.danceText, Figure: DanceSteps },
-  ];
   return (
-    <section id="activities" aria-labelledby="activities-title" className="relative overflow-clip border-y border-line bg-paper">
-      <div className={`${container} py-12 sm:py-14 lg:pt-16 lg:pb-18`}>
+    <section id="activities" aria-labelledby="activities-title" className="relative overflow-x-clip bg-milk">
+      <div className={`${container} pb-14 ${sectionPad} lg:pb-20`}>
         <h2 id="activities-title" className={h2Class}>
           {t.activities.title}
         </h2>
-        <ul className="mt-6 grid gap-5 sm:gap-6 md:mt-8 md:grid-cols-2 md:gap-10">
-          {items.map(({ title, text, Figure }) => (
-            <li key={title} className="flex flex-wrap items-center gap-4 sm:gap-6">
-              <Figure className="h-auto w-20 shrink-0 sm:w-28 lg:w-36" />
-              <div className="min-w-[10rem] flex-1 [overflow-wrap:anywhere]">
-                <h3 className="text-2xl font-extrabold text-ink lg:text-[1.9rem]">{title}</h3>
-                <p className="mt-1 text-lg leading-relaxed text-ink-soft">{text}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="min-w-0">
+            <h3 className="relative inline-flex min-h-24 max-w-full items-center px-7 pt-1 pb-5 sm:min-h-28 sm:px-10">
+              <CloudBg className="absolute inset-0 size-full" />
+              <span className="relative text-[1.45rem] leading-tight font-extrabold text-ink sm:text-[1.75rem]">{t.activities.speechTitle}</span>
+            </h3>
+            <p className={`mt-3 max-w-xl ${bodyText}`}>{t.activities.speechText}</p>
+          </div>
+
+          <div className="min-w-0 lg:mt-12">
+            <div className="flex items-end gap-3 sm:gap-5">
+              <h3 className="text-[1.6rem] leading-tight font-extrabold text-ink sm:text-[1.9rem]">{t.activities.danceTitle}</h3>
+              <DanceSteps className="mb-1 h-auto w-24 shrink-0 sm:w-32" />
+            </div>
+            <Ribbon className="mt-1 block h-5 w-44 sm:h-6 sm:w-56" />
+            <p className={`mt-3 max-w-xl ${bodyText}`}>{t.activities.danceText}</p>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -259,36 +266,46 @@ export function Activities({ locale }: { locale: Locale }) {
 export function Documents({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   return (
-    <section id="documents" aria-labelledby="documents-title" className="relative bg-milk">
-      <div className={`${container} py-12 sm:py-14 lg:pt-16`}>
+    <section id="documents" aria-labelledby="documents-title" className="relative overflow-x-clip bg-milk">
+      <div className={`${container} pb-14 ${sectionPad}`}>
         <h2 id="documents-title" className={h2Class}>
           {t.documents.title}
         </h2>
-        {documents.length > 0 && (
-          <ul className="mt-6 grid max-w-3xl gap-2">
-            {documents.map((doc) => (
-              <li key={doc.href}>
-                <a
-                  href={doc.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex min-h-13 items-center gap-3 rounded-2xl border-2 border-line bg-paper px-4 py-2 text-lg font-bold text-ink transition-colors duration-200 hover:border-teal"
-                >
-                  <DocIcon className="size-6 shrink-0 text-teal" />
-                  <span className="min-w-0 flex-1">{doc.title[locale]}</span>
-                  <ExternalIcon className="size-4 shrink-0 text-ink-soft" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-        {documentsFolderUrl && (
-          <a href={documentsFolderUrl} target="_blank" rel="noopener noreferrer" className={`${btnSecondary} mt-6`}>
-            <DocIcon />
-            {t.documents.folder}
-            <ExternalIcon />
-          </a>
-        )}
+        <p className={`mt-3 max-w-2xl ${bodyText}`}>{t.documents.intro}</p>
+
+        {/* Раскрытый бумажный разворот */}
+        <div className="relative mt-6 max-w-4xl rounded-[1.5rem] bg-paper p-5 shadow-[0_16px_32px_-24px_rgb(29_34_48/0.5)] sm:p-8">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-y-5 left-1/2 hidden w-6 -translate-x-1/2 bg-gradient-to-r from-transparent via-line/70 to-transparent md:block" />
+          {documents.length > 0 && (
+            <ul className="grid gap-5 md:grid-cols-2 md:gap-x-16">
+              {documents.map((doc) => (
+                <li key={doc.href}>
+                  <a
+                    href={doc.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex min-h-11 items-start gap-3 text-lg font-bold text-ink"
+                  >
+                    <DocIcon className="mt-0.5 size-6 shrink-0 text-teal" />
+                    <span className="underline decoration-sun decoration-2 underline-offset-4 group-hover:decoration-teal">
+                      {doc.title[locale]}
+                      <span className="sr-only"> ({t.documents.opens})</span>
+                    </span>
+                  </a>
+                  {doc.note && <p className="mt-1 pl-9 text-base text-ink-soft">{doc.note[locale]}</p>}
+                </li>
+              ))}
+            </ul>
+          )}
+          {documentsFolderUrl && (
+            <a href={documentsFolderUrl} target="_blank" rel="noopener noreferrer" className={`${documents.length ? "mt-6" : ""} ${textLink}`}>
+              <DocIcon className="size-5" />
+              {t.documents.folder}
+              <ExternalIcon />
+              <span className="sr-only"> ({t.documents.opens})</span>
+            </a>
+          )}
+        </div>
       </div>
     </section>
   );
@@ -300,45 +317,48 @@ export function Contacts({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   const wa = whatsappUrl();
   return (
-    <section id="contacts" aria-labelledby="contacts-title" className="relative bg-milk">
-      <div className={`${container} grid items-end gap-8 py-12 sm:py-14 md:grid-cols-[minmax(0,1fr)_auto] lg:pt-16 lg:pb-18`}>
+    <section id="contacts" aria-labelledby="contacts-title" className="relative overflow-x-clip bg-milk">
+      <TopWave fill={C.milk} />
+      <div
+        className={`${container} grid gap-8 pb-14 ${sectionPad} lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-center lg:gap-14 lg:pb-18`}
+      >
         <div className="min-w-0">
           <h2 id="contacts-title" className={h2Class}>
             {t.contacts.title}
           </h2>
-          <p className="mt-3 text-lg text-ink-soft">{t.contacts.lead}</p>
+          <p className="mt-4 flex items-start gap-2 text-sm font-semibold text-ink-soft">
+            <PinIcon className="size-4 shrink-0 translate-y-0.5" />
+            {t.contacts.address}
+          </p>
+          <address className="mt-1 text-xl leading-snug font-extrabold text-ink not-italic sm:text-2xl">{address(locale)}</address>
 
-          <dl className="mt-6 grid gap-5 sm:grid-cols-[auto_1fr] sm:gap-x-10">
-            <div className="sm:col-span-2">
-              <dt className="flex items-center gap-2 font-semibold text-ink-soft">
+          <dl className="mt-5 flex flex-wrap gap-x-10 gap-y-3">
+            <div>
+              <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
+                <ClockIcon className="size-4" />
+                {t.contacts.hours}
+              </dt>
+              <dd className="mt-1 text-xl font-extrabold text-ink">{site.hours}</dd>
+            </div>
+            <div>
+              <dt className="flex items-center gap-2 text-sm font-semibold text-ink-soft">
                 <PhoneIcon className="size-4" />
                 {t.contacts.phone}
               </dt>
-              <dd className="mt-1">
-                <a href={site.phone.href} className="inline-flex min-h-11 items-center text-[min(1.75rem,8.2vw)] leading-tight font-extrabold whitespace-nowrap text-ink underline decoration-sun decoration-4 underline-offset-[6px] sm:text-4xl">
+              <dd>
+                <a
+                  href={site.phone.href}
+                  className="inline-flex min-h-11 items-center text-xl font-extrabold whitespace-nowrap text-ink underline decoration-sun decoration-4 underline-offset-[6px]"
+                >
                   {site.phone.display}
                 </a>
               </dd>
             </div>
-            <div>
-              <dt className="flex items-center gap-2 font-semibold text-ink-soft">
-                <ClockIcon className="size-4" />
-                {t.contacts.hours}
-              </dt>
-              <dd className="mt-1 text-xl font-bold text-ink">{site.hours}</dd>
-            </div>
-            <div>
-              <dt className="flex items-center gap-2 font-semibold text-ink-soft">
-                <PinIcon className="size-4" />
-                {t.contacts.address}
-              </dt>
-              <dd className="mt-1 text-xl leading-snug font-bold text-ink">
-                <address className="not-italic">{address(locale)}</address>
-              </dd>
-            </div>
           </dl>
 
-          <div className="mt-7 flex flex-col gap-3 min-[480px]:flex-row min-[480px]:flex-wrap">
+          <p className={`mt-4 max-w-xl ${bodyText}`}>{t.contacts.note}</p>
+
+          <div className="mt-6 flex flex-col gap-3 min-[480px]:flex-row min-[480px]:flex-wrap">
             <a href={site.phone.href} aria-label={t.callAria} className={btnPrimary}>
               <PhoneIcon />
               {t.call}
@@ -347,6 +367,7 @@ export function Contacts({ locale }: { locale: Locale }) {
               <PinIcon />
               {t.contacts.map}
               <ExternalIcon />
+              <span className="sr-only"> ({t.documents.opens})</span>
             </a>
             {wa && (
               <a href={wa} target="_blank" rel="noopener noreferrer" className={btnSecondary}>
@@ -361,10 +382,14 @@ export function Contacts({ locale }: { locale: Locale }) {
               </a>
             )}
           </div>
-          <p className="mt-3 text-sm text-ink-soft">{t.contacts.mapHint}</p>
         </div>
 
-        <MapTrail className="pointer-events-none hidden h-auto w-56 md:block lg:mb-10 lg:w-64" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none relative aspect-[16/10] w-full max-w-lg overflow-hidden rounded-[1.75rem] rounded-tl-[5rem] border-2 border-line bg-paper lg:aspect-[4/3] lg:justify-self-end lg:rounded-tl-[7rem]"
+        >
+          <MapScene className="absolute inset-0 size-full" />
+        </div>
       </div>
     </section>
   );

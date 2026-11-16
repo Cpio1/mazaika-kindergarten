@@ -10,6 +10,8 @@ export type DocumentItem = {
   title: Localized;
   /** Например "/media/documents/license.pdf" или полная ссылка на файл. */
   href: string;
+  /** Одна строка о содержании документа — только если оно известно. */
+  note?: Localized;
 };
 
 export const documents: DocumentItem[] = [];
