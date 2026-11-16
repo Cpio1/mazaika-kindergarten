@@ -114,21 +114,6 @@ export function MosaicScene({ className = "" }: { className?: string }) {
 
 /* ───────────── О садике ───────────── */
 
-/** Небольшое речевое облако с волнистым краем — знак языка обучения. */
-export function CloudShape({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 92" className={className} {...svgProps}>
-      <g fill={C.lilac}>
-        <circle cx="36" cy="40" r="24" />
-        <circle cx="62" cy="30" r="28" />
-        <circle cx="88" cy="42" r="22" />
-        <rect x="14" y="40" width="94" height="32" rx="16" />
-        <path d="M30 66 L18 90 L50 70Z" />
-      </g>
-    </svg>
-  );
-}
-
 /* ───────────── Питание ───────────── */
 
 /** Тарелка-полукруг с узором и пять маленьких цветных деталей по ободу — визуальный счёт. */
@@ -201,13 +186,32 @@ function Footprint({ x, y, angle, color }: { x: number; y: number; angle: number
   );
 }
 
-/** Хореография: пара танцевальных следов вдоль плавной дуги. */
-export function DanceSteps({ className = "" }: { className?: string }) {
+/** Хореография: изогнутая двухцветная лента и пара танцевальных следов над ней. */
+export function DanceRibbon({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 140 104" className={className} {...svgProps}>
-      <path d="M6 96 C 26 22, 108 2, 136 76" fill="none" stroke={C.apricot} strokeWidth="7" strokeLinecap="round" strokeDasharray="0.1 14" />
-      <Footprint x={44} y={58} angle={40} color={C.teal} />
-      <Footprint x={96} y={48} angle={112} color={C.turquoise} />
+    <svg viewBox="0 0 150 112" className={className} {...svgProps}>
+      <path d="M8 92 C 38 58, 68 104, 100 72 S 134 40, 144 56" fill="none" stroke={C.apricot} strokeWidth="11" strokeLinecap="round" />
+      <path d="M10 104 C 40 70, 70 116, 102 84 S 136 52, 146 68" fill="none" stroke={C.lilac} strokeWidth="5" strokeLinecap="round" />
+      <Footprint x={40} y={36} angle={-18} color={C.teal} />
+      <Footprint x={80} y={24} angle={16} color={C.turquoise} />
+    </svg>
+  );
+}
+
+/* ───────────── Документы ───────────── */
+
+/** Приоткрытая папка с цветными листами. */
+export function FolderOpen({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 124 104" className={className} {...svgProps}>
+      <rect x="10" y="12" width="42" height="18" rx="7" fill={C.apricotDeep} />
+      <rect x="10" y="22" width="100" height="72" rx="11" fill={C.apricotDeep} />
+      <rect x="22" y="8" width="56" height="62" rx="6" fill={C.teal} transform="rotate(-9 50 39)" />
+      <rect x="46" y="4" width="56" height="62" rx="6" fill={C.sun} transform="rotate(8 74 35)" />
+      <rect x="34" y="12" width="54" height="58" rx="6" fill={C.board} />
+      <path d="M44 28 h34 M44 38 h34 M44 48 h22" stroke={C.lilac} strokeWidth="4" strokeLinecap="round" />
+      <path d="M12 50 Q10 46 15 46 H109 Q114 46 113 50 L106 92 Q105 98 99 98 H21 Q15 98 14 92Z" fill={C.apricot} />
+      <circle cx="60" cy="72" r="6" fill={C.sunSoft} />
     </svg>
   );
 }
@@ -237,16 +241,6 @@ export function MapScene({ className = "" }: { className?: string }) {
       <rect x="250" y="66" width="40" height="30" rx="4" fill={C.turquoise} />
       <path d="M244 70 L270 46 L296 70Z" fill={C.apricotDeep} stroke={C.apricotDeep} strokeWidth="7" strokeLinejoin="round" />
       <path d="M264 96 V86 A6 6 0 0 1 276 86 V96Z" fill={C.sun} />
-    </svg>
-  );
-}
-
-/** Цветная лента — мотив хореографии. */
-export function Ribbon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 240 40" preserveAspectRatio="none" className={className} {...svgProps}>
-      <path d="M6 22 C 46 2, 86 42, 126 22 S 196 2, 234 20" fill="none" stroke={C.apricot} strokeWidth="9" strokeLinecap="round" />
-      <path d="M6 32 C 46 12, 86 52, 126 32 S 196 12, 234 30" fill="none" stroke={C.lilac} strokeWidth="5" strokeLinecap="round" />
     </svg>
   );
 }

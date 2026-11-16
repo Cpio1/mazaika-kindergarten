@@ -5,7 +5,7 @@ import { getDictionary, type Locale } from "@/lib/i18n";
 import { aboutMedia, heroPhoto, logo } from "@/lib/media";
 import { mapUrl, site, whatsappUrl } from "@/lib/site";
 import { ClockIcon, DocIcon, ExternalIcon, PhoneIcon, PinIcon } from "./icons";
-import { CloudBg, DanceSteps, HeroCluster, MapScene, MosaicScene, PlateGrains, Ribbon, Wave, mosaicColors as C } from "./Mosaic";
+import { CloudBg, DanceRibbon, FolderOpen, HeroCluster, MapScene, MosaicScene, PlateGrains, SpeechPair, Wave, mosaicColors as C } from "./Mosaic";
 
 const container = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
 /** Верхний отступ секций с якорями согласован с --sec-pt в globals.css. */
@@ -232,30 +232,28 @@ export function Food({ locale }: { locale: Locale }) {
 
 export function Activities({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
+  const items = [
+    { title: t.activities.speechTitle, text: t.activities.speechText, Figure: SpeechPair, offset: "" },
+    { title: t.activities.danceTitle, text: t.activities.danceText, Figure: DanceRibbon, offset: "lg:mt-12" },
+  ];
   return (
     <section id="activities" aria-labelledby="activities-title" className="relative overflow-x-clip bg-milk">
       <div className={`${container} pb-14 ${sectionPad} lg:pb-20`}>
         <h2 id="activities-title" className={h2Class}>
           {t.activities.title}
         </h2>
-        <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="min-w-0">
-            <h3 className="relative inline-flex min-h-24 max-w-full items-center px-7 pt-1 pb-5 sm:min-h-28 sm:px-10">
-              <CloudBg className="absolute inset-0 size-full" />
-              <span className="relative text-[1.45rem] leading-tight font-extrabold text-ink sm:text-[1.75rem]">{t.activities.speechTitle}</span>
-            </h3>
-            <p className={`mt-3 max-w-xl ${bodyText}`}>{t.activities.speechText}</p>
-          </div>
-
-          <div className="min-w-0 lg:mt-12">
-            <div className="flex items-end gap-3 sm:gap-5">
-              <h3 className="text-[1.6rem] leading-tight font-extrabold text-ink sm:text-[1.9rem]">{t.activities.danceTitle}</h3>
-              <DanceSteps className="mb-1 h-auto w-24 shrink-0 sm:w-32" />
-            </div>
-            <Ribbon className="mt-1 block h-5 w-44 sm:h-6 sm:w-56" />
-            <p className={`mt-3 max-w-xl ${bodyText}`}>{t.activities.danceText}</p>
-          </div>
-        </div>
+        {/* Два направления в одной композиции: у каждого свой рисунок-силуэт, текст на спокойном фоне */}
+        <ul className="mt-7 grid gap-8 sm:gap-10 lg:mt-10 lg:max-w-6xl lg:grid-cols-2 lg:gap-16">
+          {items.map(({ title, text, Figure, offset }) => (
+            <li key={title} className={`flex flex-wrap items-start gap-x-4 gap-y-2 sm:gap-x-6 ${offset}`}>
+              <Figure className="h-auto w-20 shrink-0 sm:w-28 lg:w-36" />
+              <div className="min-w-[11rem] flex-1 [overflow-wrap:anywhere] sm:pt-2">
+                <h3 className="text-[1.6rem] leading-tight font-extrabold text-ink sm:text-[1.9rem]">{title}</h3>
+                <p className={`mt-2 max-w-md ${bodyText}`}>{text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
@@ -265,27 +263,26 @@ export function Activities({ locale }: { locale: Locale }) {
 
 export function Documents({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
+  const empty = documents.length === 0 && !documentsFolderUrl;
   return (
     <section id="documents" aria-labelledby="documents-title" className="relative overflow-x-clip bg-milk">
-      <div className={`${container} pb-14 ${sectionPad}`}>
-        <h2 id="documents-title" className={h2Class}>
-          {t.documents.title}
-        </h2>
-        <p className={`mt-3 max-w-2xl ${bodyText}`}>{t.documents.intro}</p>
+      <TopWave fill={C.milk} />
+      <div className={`${container} pb-14 ${sectionPad} lg:pb-16`}>
+        {/* Панель в форме папки: язычок сверху слева */}
+        <div className="relative mt-5 max-w-5xl rounded-[1.75rem] rounded-tl-none bg-turquoise-soft px-5 pt-6 pb-7 sm:mt-6 sm:rounded-[2.5rem] sm:rounded-tl-none sm:px-10 sm:pt-8 sm:pb-10 lg:px-14">
+          <span aria-hidden="true" className="pointer-events-none absolute bottom-full left-0 h-5 w-36 rounded-t-[1.25rem] bg-turquoise-soft sm:h-6 sm:w-52" />
+          <div className="flex items-start gap-4 sm:gap-6">
+            <h2 id="documents-title" className={h2Class}>
+              {t.documents.title}
+            </h2>
+            <FolderOpen className="-mt-1 h-auto w-16 shrink-0 sm:-mt-2 sm:w-20 lg:w-24" />
+          </div>
 
-        {/* Раскрытый бумажный разворот */}
-        <div className="relative mt-6 max-w-4xl rounded-[1.5rem] bg-paper p-5 shadow-[0_16px_32px_-24px_rgb(29_34_48/0.5)] sm:p-8">
-          <div aria-hidden="true" className="pointer-events-none absolute inset-y-5 left-1/2 hidden w-6 -translate-x-1/2 bg-gradient-to-r from-transparent via-line/70 to-transparent md:block" />
           {documents.length > 0 && (
-            <ul className="grid gap-5 md:grid-cols-2 md:gap-x-16">
+            <ul className="mt-5 grid gap-x-12 gap-y-4 md:grid-cols-2">
               {documents.map((doc) => (
                 <li key={doc.href}>
-                  <a
-                    href={doc.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group inline-flex min-h-11 items-start gap-3 text-lg font-bold text-ink"
-                  >
+                  <a href={doc.href} target="_blank" rel="noopener noreferrer" className="group inline-flex min-h-11 items-start gap-3 text-lg font-bold text-ink">
                     <DocIcon className="mt-0.5 size-6 shrink-0 text-teal" />
                     <span className="underline decoration-sun decoration-2 underline-offset-4 group-hover:decoration-teal">
                       {doc.title[locale]}
@@ -297,13 +294,21 @@ export function Documents({ locale }: { locale: Locale }) {
               ))}
             </ul>
           )}
+
           {documentsFolderUrl && (
-            <a href={documentsFolderUrl} target="_blank" rel="noopener noreferrer" className={`${documents.length ? "mt-6" : ""} ${textLink}`}>
-              <DocIcon className="size-5" />
-              {t.documents.folder}
+            <a href={documentsFolderUrl} target="_blank" rel="noopener noreferrer" className={`mt-6 ${btnPrimary}`}>
+              <DocIcon />
+              {t.documents.open}
               <ExternalIcon />
               <span className="sr-only"> ({t.documents.opens})</span>
             </a>
+          )}
+
+          {empty && (
+            <p className="mt-4 flex items-center gap-3 text-lg font-bold text-ink sm:mt-5 sm:text-xl">
+              <ClockIcon className="size-6 shrink-0 text-teal" />
+              {t.documents.empty}
+            </p>
           )}
         </div>
       </div>
@@ -318,7 +323,6 @@ export function Contacts({ locale }: { locale: Locale }) {
   const wa = whatsappUrl();
   return (
     <section id="contacts" aria-labelledby="contacts-title" className="relative overflow-x-clip bg-milk">
-      <TopWave fill={C.milk} />
       <div
         className={`${container} grid gap-8 pb-14 ${sectionPad} lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-center lg:gap-14 lg:pb-18`}
       >

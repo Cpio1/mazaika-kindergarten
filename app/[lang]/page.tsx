@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { Gallery } from "@/components/Gallery";
 import { About, Activities, Contacts, Documents, Food, Hero, SiteFooter } from "@/components/Sections";
 import { SiteHeader, type NavItem } from "@/components/SiteHeader";
-import { hasDocuments } from "@/lib/documents";
 import { getDictionary, isLocale } from "@/lib/i18n";
 import { gallery } from "@/lib/media";
 
@@ -17,7 +16,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
     { id: "food", label: t.nav.food },
     { id: "activities", label: t.nav.activities },
     ...(hasGallery ? [{ id: "gallery", label: t.nav.gallery }] : []),
-    ...(hasDocuments ? [{ id: "documents", label: t.nav.documents }] : []),
+    { id: "documents", label: t.nav.documents },
     { id: "contacts", label: t.nav.contacts },
   ];
 
@@ -30,7 +29,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         <Food locale={lang} />
         <Activities locale={lang} />
         {hasGallery && <Gallery locale={lang} photos={gallery} />}
-        {hasDocuments && <Documents locale={lang} />}
+        <Documents locale={lang} />
         <Contacts locale={lang} />
       </main>
       <SiteFooter locale={lang} />

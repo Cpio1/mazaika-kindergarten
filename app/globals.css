@@ -99,6 +99,11 @@ main section[id]:not(#hero) {
   scroll-margin-top: calc(var(--header-h) + 16px - var(--sec-pt));
 }
 
+/* У документов первым идёт язычок папки — он встаёт чуть ниже шапки, заголовок сразу под ним */
+main section#documents {
+  scroll-margin-top: calc(var(--header-h) + 8px - var(--sec-pt));
+}
+
 /* Единственное движение: последняя деталь солнца мягко встаёт на место */
 @media (prefers-reduced-motion: no-preference) {
   .mosaic-drop {
