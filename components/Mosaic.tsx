@@ -116,36 +116,86 @@ export function MosaicScene({ className = "" }: { className?: string }) {
 
 /* ───────────── Питание ───────────── */
 
-/** Тарелка-полукруг с узором и пять маленьких цветных деталей по ободу — визуальный счёт. */
-export function PlateGrains({ className = "" }: { className?: string }) {
-  const cx = 110;
-  const cy = 18;
-  const pieces = [C.turquoise, C.apricotDeep, C.sun, C.lilac, C.teal];
+/** Волнистый край салфетки: окружность с мягкими «гребешками». */
+function scallopPath(cx: number, cy: number, r: number, amp: number, waves: number) {
+  const pts: string[] = [];
+  const steps = waves * 12;
+  for (let k = 0; k <= steps; k++) {
+    const t = (k / steps) * Math.PI * 2;
+    const rr = r + amp * Math.cos(waves * t);
+    pts.push(`${(cx + Math.cos(t) * rr).toFixed(1)} ${(cy + Math.sin(t) * rr).toFixed(1)}`);
+  }
+  return `M${pts.join(" L")}Z`;
+}
+
+function arcPath(cx: number, cy: number, r: number, fromDeg: number, toDeg: number) {
+  const p = (deg: number) => {
+    const a = (deg * Math.PI) / 180;
+    return `${(cx + Math.cos(a) * r).toFixed(1)} ${(cy + Math.sin(a) * r).toFixed(1)}`;
+  };
+  const sweep = (((toDeg - fromDeg) % 360) + 360) % 360;
+  return `M${p(fromDeg)} A${r} ${r} 0 ${sweep > 180 ? 1 : 0} 1 ${p(toDeg)}`;
+}
+
+/**
+ * Детский стол сверху — аппликация из цветной бумаги: бирюзовая салфетка с волнистым краем,
+ * уголок салфетки в клетку, молочная тарелка, абрикосовая ложка и цифра 5 из пяти деталей мозаики:
+ * капсула, скруглённый квадрат, короткая дуга, длинная дуга и лепесток.
+ */
+export function TableSetting({ className = "" }: { className?: string }) {
+  const cx = 158;
+  const cy = 128;
+  const shadow = "url(#mz-paper-shadow)";
   return (
-    <svg viewBox="0 0 220 124" className={className} {...svgProps}>
-      <rect x="4" y="8" width="212" height="14" rx="7" fill={C.apricot} />
-      <path d={`M${cx - 100} ${cy} A100 100 0 0 0 ${cx + 100} ${cy}Z`} fill={C.board} stroke={C.boardLine} strokeWidth="3" />
-      <path d={`M${cx - 62} ${cy} A62 62 0 0 0 ${cx + 62} ${cy}Z`} fill={C.sunSoft} />
-      <path
-        d={`M${cx - 46} ${cy} A46 46 0 0 0 ${cx + 46} ${cy}`}
-        fill="none"
-        stroke={C.apricot}
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeDasharray="0.1 11"
-      />
-      <path d={`M${cx - 22} ${cy} A22 22 0 0 0 ${cx + 22} ${cy}Z`} fill={C.sunLight} />
-      {pieces.map((col, i) => {
-        const deg = 160 - i * 35;
-        const a = (deg * Math.PI) / 180;
-        const x = cx + Math.cos(a) * 81;
-        const y = cy + Math.sin(a) * 81;
-        return i % 2 === 0 ? (
-          <circle key={i} cx={x} cy={y} r="8.5" fill={col} />
-        ) : (
-          <ellipse key={i} cx={x} cy={y} rx="12" ry="7" transform={`rotate(${deg + 90} ${x} ${y})`} fill={col} />
-        );
-      })}
+    <svg viewBox="0 0 320 262" className={className} {...svgProps}>
+      <defs>
+        <filter id="mz-paper-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2.2" stdDeviation="1.6" floodColor="#1d2230" floodOpacity="0.2" />
+        </filter>
+        <pattern id="mz-gingham" width="16" height="16" patternUnits="userSpaceOnUse">
+          <rect width="16" height="16" fill={C.board} />
+          <rect width="8" height="16" fill={C.apricot} opacity="0.45" />
+          <rect width="16" height="8" fill={C.apricot} opacity="0.45" />
+        </pattern>
+      </defs>
+
+      {/* уголок салфетки в клетку */}
+      <rect x="22" y="150" width="104" height="104" rx="8" fill="url(#mz-gingham)" filter={shadow} transform="rotate(-17 74 202)" />
+
+      {/* бирюзовая салфетка с волнистым краем */}
+      <path d={scallopPath(cx, cy, 104, 5.5, 14)} fill={C.turquoise} filter={shadow} transform={`rotate(9 ${cx} ${cy})`} />
+
+      {/* молочная тарелка */}
+      <circle cx={cx} cy={cy} r="84" fill={C.board} filter={shadow} />
+      <circle cx={cx} cy={cy} r="66" fill={C.milk} stroke={C.boardLine} strokeWidth="2" />
+
+      {/* абрикосовая ложка */}
+      <g filter={shadow} transform="rotate(-24 290 140)">
+        <rect x="286.5" y="132" width="9" height="74" rx="4.5" fill={C.apricot} />
+        <ellipse cx="291" cy="120" rx="13" ry="19" fill={C.apricot} />
+        <ellipse cx="291" cy="117" rx="7" ry="11" fill={C.apricotDeep} opacity="0.35" />
+      </g>
+
+      {/* цифра 5 из пяти деталей мозаики: капсула, квадрат, короткая дуга, длинная дуга, лепесток */}
+      <g filter={shadow} transform={`translate(${cx - 3} ${cy}) scale(1.3)`} fill="none">
+        <path d="M-16 -36 H19" stroke={C.teal} strokeWidth="13" strokeLinecap="round" />
+        <rect x="-24" y="-28" width="14" height="21" rx="3.5" fill={C.sun} />
+        <path d={arcPath(2, 14, 20, 238, 300)} stroke={C.lilac} strokeWidth="13" />
+        <path d={arcPath(2, 14, 20, 306, 120)} stroke={C.apricotDeep} strokeWidth="13" />
+        <path d={petalPath(-12, 31.5, 15, 6.5, 186)} fill={C.apricot} />
+      </g>
+    </svg>
+  );
+}
+
+/** Нижний волнистый край секции питания с двухцветной полоской — как край скатерти. */
+export function TableclothEdge({ fill, className = "" }: { fill: string; className?: string }) {
+  const curve = "M0 14 C 180 34 360 36 540 20 S 900 2 1080 18 S 1320 36 1440 24";
+  return (
+    <svg viewBox="0 0 1440 46" preserveAspectRatio="none" className={className} {...svgProps}>
+      <path d={`${curve} V0 H0Z`} fill={fill} />
+      <path d={curve} fill="none" stroke={C.board} strokeWidth="7" vectorEffect="non-scaling-stroke" />
+      <path d={curve} fill="none" stroke={C.apricot} strokeWidth="7" strokeDasharray="16 16" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }

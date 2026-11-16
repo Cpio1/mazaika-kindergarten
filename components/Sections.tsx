@@ -5,7 +5,7 @@ import { getDictionary, type Locale } from "@/lib/i18n";
 import { aboutMedia, heroPhoto, logo } from "@/lib/media";
 import { mapUrl, site, whatsappUrl } from "@/lib/site";
 import { ClockIcon, DocIcon, ExternalIcon, PhoneIcon, PinIcon } from "./icons";
-import { CloudBg, DanceRibbon, FolderOpen, HeroCluster, MapScene, MosaicScene, PlateGrains, SpeechPair, Wave, mosaicColors as C } from "./Mosaic";
+import { CloudBg, DanceRibbon, FolderOpen, HeroCluster, MapScene, MosaicScene, SpeechPair, TableSetting, TableclothEdge, Wave, mosaicColors as C } from "./Mosaic";
 
 const container = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
 /** Верхний отступ секций с якорями согласован с --sec-pt в globals.css. */
@@ -205,24 +205,31 @@ export function Food({ locale }: { locale: Locale }) {
   return (
     <section id="food" aria-labelledby="food-title" className="relative z-10 overflow-x-clip bg-sun-soft">
       <TopWave fill={C.sunSoft} />
-      <Wave fill={C.sunSoft} flip className="pointer-events-none absolute inset-x-0 top-full block h-5 w-full sm:h-8" />
+      <TableclothEdge fill={C.sunSoft} className="pointer-events-none absolute inset-x-0 top-full block h-6 w-full sm:h-9" />
       <div
-        className={`${container} grid grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-x-4 gap-y-4 pb-12 ${sectionPad} sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-16 lg:gap-y-3 lg:pb-16`}
+        className={`${container} grid gap-y-5 pb-12 ${sectionPad} lg:grid-cols-[minmax(0,1fr)_auto] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-16 lg:gap-y-4 lg:pb-14`}
       >
-        <div className="col-start-2 row-start-1 min-w-0 lg:col-start-1 lg:self-end">
+        <div className="min-w-0 lg:col-start-1 lg:row-start-1">
           <p className="text-base font-bold text-ink-soft sm:text-lg">{t.food.title}</p>
           <h2 id="food-title" className={`mt-1 ${h2Class}`}>
             {t.food.headline}
           </h2>
         </div>
-        <div className="col-span-2 row-start-2 min-w-0 lg:col-span-1 lg:col-start-1 lg:self-start">
-          <p className={`max-w-2xl ${bodyText} text-ink`}>{t.food.text}</p>
-          <a href={site.phone.href} aria-label={t.food.menuLinkAria} className={`mt-2 ${textLink}`}>
+
+        {/* Детский стол сверху: салфетка, тарелка с цифрой 5, ложка */}
+        <TableSetting className="mx-auto h-auto w-full max-w-[19rem] sm:max-w-[22rem] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:-mt-4 lg:self-center lg:w-[24rem] lg:max-w-none xl:w-[26rem]" />
+
+        <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+          <p className={`max-w-xl ${bodyText} text-ink`}>{t.food.text}</p>
+          <a
+            href={site.phone.href}
+            aria-label={t.food.menuLinkAria}
+            className="mt-4 inline-flex min-h-12 items-center gap-2 rounded-full bg-teal px-5 text-base font-bold text-white shadow-[0_4px_0_-1px_#075452] transition-[background-color,transform,box-shadow] duration-200 hover:bg-teal-dark active:translate-y-0.5 active:shadow-[0_2px_0_-1px_#075452] sm:text-lg"
+          >
             <PhoneIcon className="size-5" />
             {t.food.menuLink}
           </a>
         </div>
-        <PlateGrains className="col-start-1 row-start-1 h-auto w-full lg:col-start-2 lg:row-span-2 lg:w-80 xl:w-96" />
       </div>
     </section>
   );
