@@ -1,17 +1,19 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { documents, documentsFolderUrl } from "@/lib/documents";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { aboutMedia, heroPhoto, logo } from "@/lib/media";
 import { mapUrl, site, whatsappUrl } from "@/lib/site";
 import { ClockIcon, DocIcon, ExternalIcon, PhoneIcon, PinIcon } from "./icons";
 import {
-  HeroPhotoPieces,
-  MosaicDance,
-  MosaicHouseSmall,
-  MosaicPlate,
+  CloudShape,
+  DanceSteps,
+  HeroSun,
+  MapTrail,
   MosaicScene,
-  MosaicSpeech,
+  PlateGrains,
   ShapeMark,
+  SpeechPair,
   mosaicColors as C,
 } from "./Mosaic";
 
@@ -40,17 +42,16 @@ export function Hero({ locale }: { locale: Locale }) {
     <section id="hero" aria-labelledby="hero-title" className="relative overflow-clip bg-milk">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 -bottom-40 size-[26rem] rounded-full bg-sun-soft/70 md:-right-16 md:-bottom-56 md:size-[40rem]"
+        className="pointer-events-none absolute -right-40 -bottom-56 hidden size-[36rem] rounded-full bg-sun-soft/60 lg:block"
       />
       <div
-        aria-hidden="true"
-        className="pegboard pointer-events-none absolute top-6 right-[38%] hidden h-40 w-56 opacity-80 md:block"
-      />
-      <div
-        className={`${container} relative grid gap-7 pt-5 pb-10 sm:pt-8 md:pt-10 md:pb-14 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-8 lg:pt-12 lg:pb-16`}
+        className={`${container} relative grid gap-8 pt-6 pb-10 sm:pt-8 md:pb-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-12 lg:pt-12 lg:pb-16`}
       >
-        <div>
-          <h1 id="hero-title" className="text-[min(2.05rem,10.5vw)] leading-[1.08] font-extrabold tracking-tight [overflow-wrap:anywhere] text-ink min-[400px]:text-[min(2.35rem,10.5vw)] sm:text-5xl lg:text-[3.6rem]">
+        <div className="min-w-0 lg:max-w-[36rem]">
+          <h1
+            id="hero-title"
+            className="text-[min(2.05rem,10.5vw)] leading-[1.08] font-extrabold tracking-tight [overflow-wrap:anywhere] text-ink min-[400px]:text-[min(2.35rem,10.5vw)] sm:text-5xl lg:text-[3.4rem] xl:text-[3.6rem]"
+          >
             {t.hero.title}
           </h1>
           <p className="mt-3 max-w-[34rem] text-[1.05rem] leading-relaxed text-ink-soft sm:mt-4 sm:text-lg lg:text-xl">
@@ -87,27 +88,31 @@ export function Hero({ locale }: { locale: Locale }) {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[17rem] min-[400px]:max-w-[19rem] sm:max-w-[22rem] lg:max-w-[33rem]">
-          {heroPhoto ? (
-            <div className="relative">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-[2rem] border-[6px] border-paper bg-paper shadow-[0_20px_40px_-24px_rgb(29_34_48/0.45)]">
-                <Image
-                  src={heroPhoto.src}
-                  alt={heroPhoto.alt[locale] || t.hero.photoAlt}
-                  fill
-                  preload
-                  sizes="(min-width: 1024px) 42vw, 80vw"
-                  className="object-cover"
-                  style={{ objectPosition: heroPhoto.position ?? "50% 40%" }}
-                />
-              </div>
-              <HeroPhotoPieces className="pointer-events-none absolute -top-6 -right-4 w-24 md:w-32" />
-              <ShapeMark shape="quarter" color={C.lilac} className="pointer-events-none absolute -bottom-3 -left-3 size-12 md:size-16" />
+        {heroPhoto ? (
+          <div className="flex items-start justify-center gap-3 sm:gap-5 lg:justify-end">
+            <HeroSun className="mt-2 h-auto w-20 shrink-0 sm:w-28 lg:mt-8 lg:w-28 xl:w-36" />
+            <div className="relative aspect-[4/5] w-[min(14.5rem,58vw)] shrink-0 overflow-hidden rounded-t-full rounded-b-[1.75rem] border-[6px] border-paper bg-paper shadow-[0_20px_40px_-24px_rgb(29_34_48/0.45)] sm:w-[17rem] lg:aspect-[3/4] lg:w-[18rem] xl:w-[21rem]">
+              <Image
+                src={heroPhoto.src}
+                alt={heroPhoto.alt[locale] || t.hero.photoAlt}
+                fill
+                preload
+                sizes="(min-width: 1280px) 336px, (min-width: 1024px) 288px, (min-width: 640px) 272px, 232px"
+                className="object-cover object-[var(--pos)] lg:object-[var(--pos-lg)]"
+                style={
+                  {
+                    "--pos": heroPhoto.position ?? "50% 50%",
+                    "--pos-lg": heroPhoto.positionDesktop ?? heroPhoto.position ?? "50% 50%",
+                  } as CSSProperties
+                }
+              />
             </div>
-          ) : (
+          </div>
+        ) : (
+          <div className="mx-auto w-full max-w-[17rem] min-[400px]:max-w-[19rem] sm:max-w-[22rem] lg:max-w-[30rem]">
             <MosaicScene className="h-auto w-full drop-shadow-[0_18px_30px_rgb(29_34_48/0.12)]" />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -117,65 +122,80 @@ export function Hero({ locale }: { locale: Locale }) {
 
 export function About({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
-  const facts = [
-    { value: t.about.groupsValue, label: t.about.groupsLabel, shape: "circle" as const, color: C.turquoise },
-    { value: t.about.ageValue, label: t.about.ageLabel, shape: "arch" as const, color: C.apricot },
-    { value: t.about.langValue, label: t.about.langLabel, shape: "petal" as const, color: C.lilac },
-  ];
+  const unit = "block text-2xl leading-tight font-extrabold text-ink sm:text-[1.75rem]";
+  const label = "block text-base font-semibold text-ink-soft";
   return (
     <section id="about" aria-labelledby="about-title" className="relative overflow-clip border-y border-line bg-paper">
-      <div className={`${container} py-12 sm:py-14 lg:pt-16 lg:pb-18`}>
-        <div className={aboutMedia ? "grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12" : ""}>
-          <div>
-            <h2 id="about-title" className={h2Class}>
-              {t.about.title}
-            </h2>
-            <p className="mt-3 max-w-2xl text-lg leading-relaxed text-ink-soft">{t.about.lead}</p>
-            <ul className={`mt-7 grid gap-4 sm:gap-5 ${aboutMedia ? "" : "md:grid-cols-3 md:gap-8"}`}>
-              {facts.map((f) => (
-                <li key={f.label} className="flex items-center gap-4 md:items-start md:gap-5">
-                  <ShapeMark shape={f.shape} color={f.color} className="size-11 shrink-0 md:mt-1 md:size-14" />
-                  <span className="flex min-w-0 flex-1 flex-col [overflow-wrap:anywhere]">
-                    <span className="text-[1.75rem] leading-tight font-extrabold text-ink sm:text-4xl lg:text-[2.6rem]">
-                      {f.value}
-                    </span>
-                    <span className="text-base font-semibold text-ink-soft lg:text-lg">{f.label}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+      <div
+        className={`${container} grid gap-6 py-12 sm:gap-8 sm:py-14 lg:pt-16 lg:pb-18 ${aboutMedia ? "lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-14" : ""}`}
+      >
+        <div className="min-w-0">
+          <h2 id="about-title" className={h2Class}>
+            {t.about.title}
+          </h2>
+          <p className="mt-3 max-w-2xl text-lg leading-relaxed text-ink-soft">{t.about.lead}</p>
 
-          {aboutMedia && (
-            <div className="relative mx-auto w-full max-w-xl">
-              {aboutMedia.kind === "image" ? (
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] rounded-tr-[7rem] bg-milk">
-                  <Image
-                    src={aboutMedia.src}
-                    alt={aboutMedia.alt[locale]}
-                    fill
-                    sizes="(min-width: 1024px) 40vw, 92vw"
-                    className="object-cover"
-                    style={{ objectPosition: aboutMedia.position ?? "50% 40%" }}
-                  />
-                </div>
-              ) : (
-                <video
-                  controls
-                  playsInline
-                  preload="metadata"
-                  poster={aboutMedia.poster}
-                  width={aboutMedia.width}
-                  height={aboutMedia.height}
-                  aria-label={aboutMedia.label[locale]}
-                  className="h-auto max-h-[70svh] w-full rounded-[2rem] rounded-tr-[7rem] bg-ink/5 object-contain"
-                >
-                  <source src={aboutMedia.src} type={aboutMedia.type} />
-                </video>
-              )}
-            </div>
-          )}
+          {/* Одна композиция на общем фоне: круг, арка и речевое облако разного размера */}
+          <ul
+            className={`mt-6 grid gap-4 rounded-[2rem] bg-milk p-5 sm:gap-5 sm:p-7 lg:mt-8 ${aboutMedia ? "lg:max-w-xl" : "md:grid-cols-3 md:items-center md:rounded-[3rem]"}`}
+          >
+            <li className="flex items-center gap-4 sm:gap-5">
+              <span className="flex size-16 shrink-0 items-center justify-center rounded-full bg-teal text-[2rem] font-extrabold text-milk sm:size-20 sm:text-[2.5rem]">
+                {site.groups}
+              </span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">
+                <span className={unit}>{t.about.groupsUnit}</span>
+                <span className={label}>{t.about.groupsLabel}</span>
+              </span>
+            </li>
+            <li className={`flex items-center gap-4 sm:gap-5 ${aboutMedia ? "lg:ml-14" : ""}`}>
+              <span className="flex h-16 w-[4.75rem] shrink-0 items-end justify-center rounded-t-full bg-apricot pb-2 text-xl font-extrabold whitespace-nowrap text-ink sm:h-20 sm:w-24 sm:pb-3 sm:text-2xl">
+                {site.ageFrom}–{site.ageTo}
+              </span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">
+                <span className={unit}>{t.about.ageUnit}</span>
+                <span className={label}>{t.about.ageLabel}</span>
+              </span>
+            </li>
+            <li className={`flex items-center gap-4 sm:gap-5 ${aboutMedia ? "lg:ml-6" : ""}`}>
+              <span aria-hidden="true" className="relative flex h-[3.75rem] w-[4.75rem] shrink-0 items-center justify-center sm:h-[4.25rem] sm:w-[5.5rem]">
+                <CloudShape className="absolute inset-0 size-full" />
+                <span className="relative -mt-1.5 text-xl font-extrabold text-ink sm:text-2xl">Әә</span>
+              </span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">
+                <span className={unit}>{t.about.langValue}</span>
+                <span className={label}>{t.about.langLabel}</span>
+              </span>
+            </li>
+          </ul>
         </div>
+
+        {aboutMedia &&
+          (aboutMedia.kind === "image" ? (
+            <div className="relative mx-auto aspect-[16/10] w-full max-w-md overflow-hidden rounded-tl-[5rem] rounded-tr-[1.25rem] rounded-br-[5rem] rounded-bl-[1.25rem] bg-milk lg:aspect-[3/4] lg:w-[19rem] lg:max-w-none lg:rounded-tl-[7rem] lg:rounded-br-[7rem]">
+              <Image
+                src={aboutMedia.src}
+                alt={aboutMedia.alt[locale]}
+                fill
+                sizes="(min-width: 1024px) 304px, (min-width: 448px) 448px, 92vw"
+                className="object-cover"
+                style={{ objectPosition: aboutMedia.position ?? "50% 50%" }}
+              />
+            </div>
+          ) : (
+            <video
+              controls
+              playsInline
+              preload="metadata"
+              poster={aboutMedia.poster}
+              width={aboutMedia.width}
+              height={aboutMedia.height}
+              aria-label={aboutMedia.label[locale]}
+              className="mx-auto h-auto max-h-[70svh] w-full max-w-md rounded-tl-[5rem] rounded-tr-[1.25rem] rounded-br-[5rem] rounded-bl-[1.25rem] bg-ink/5 object-contain lg:w-[19rem]"
+            >
+              <source src={aboutMedia.src} type={aboutMedia.type} />
+            </video>
+          ))}
       </div>
     </section>
   );
@@ -187,14 +207,14 @@ export function Food({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   return (
     <section id="food" aria-labelledby="food-title" className="relative overflow-clip bg-milk">
-      <div className={`${container} flex items-center gap-5 py-12 sm:gap-8 sm:py-14 lg:gap-14 lg:py-16`}>
-        <div className="relative w-28 shrink-0 sm:w-44 lg:w-60">
-          <div aria-hidden="true" className="absolute inset-x-2 -top-3 bottom-4 rounded-t-full bg-sun-soft" />
-          <MosaicPlate className="relative h-auto w-full" />
-        </div>
+      <div className={`${container} flex items-center gap-4 py-12 sm:gap-8 sm:py-14 lg:gap-12 lg:py-16`}>
+        <PlateGrains className="h-auto w-28 shrink-0 sm:w-44 lg:w-64" />
         <div className="min-w-0">
           <p className="text-base font-bold text-teal sm:text-lg">{t.food.title}</p>
-          <h2 id="food-title" className={`${h2Class} mt-1`}>
+          <h2
+            id="food-title"
+            className="mt-1 text-[min(2rem,8.5vw)] leading-[1.1] font-extrabold [overflow-wrap:anywhere] text-ink sm:text-5xl lg:text-[3.25rem]"
+          >
             {t.food.headline}
           </h2>
           <p className="mt-2 text-lg leading-relaxed text-ink-soft">{t.food.text}</p>
@@ -209,18 +229,8 @@ export function Food({ locale }: { locale: Locale }) {
 export function Activities({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   const items = [
-    {
-      title: t.activities.speechTitle,
-      text: t.activities.speechText,
-      icon: <MosaicSpeech className="h-auto w-[78%]" />,
-      shape: "rounded-full bg-lilac-soft",
-    },
-    {
-      title: t.activities.danceTitle,
-      text: t.activities.danceText,
-      icon: <MosaicDance className="h-auto w-[78%]" />,
-      shape: "rounded-t-full rounded-b-[1.75rem] bg-apricot-soft",
-    },
+    { title: t.activities.speechTitle, text: t.activities.speechText, Figure: SpeechPair },
+    { title: t.activities.danceTitle, text: t.activities.danceText, Figure: DanceSteps },
   ];
   return (
     <section id="activities" aria-labelledby="activities-title" className="relative overflow-clip border-y border-line bg-paper">
@@ -228,15 +238,13 @@ export function Activities({ locale }: { locale: Locale }) {
         <h2 id="activities-title" className={h2Class}>
           {t.activities.title}
         </h2>
-        <ul className="mt-7 grid gap-5 md:grid-cols-2 md:gap-10">
-          {items.map((it) => (
-            <li key={it.title} className="flex flex-wrap items-center gap-4 sm:gap-6">
-              <div aria-hidden="true" className={`flex size-24 shrink-0 items-center justify-center sm:size-32 lg:size-36 ${it.shape}`}>
-                {it.icon}
-              </div>
-              <div className="min-w-[12rem] flex-1 [overflow-wrap:anywhere]">
-                <h3 className="text-2xl font-extrabold text-ink lg:text-[1.9rem]">{it.title}</h3>
-                <p className="mt-1 text-lg leading-relaxed text-ink-soft">{it.text}</p>
+        <ul className="mt-6 grid gap-5 sm:gap-6 md:mt-8 md:grid-cols-2 md:gap-10">
+          {items.map(({ title, text, Figure }) => (
+            <li key={title} className="flex flex-wrap items-center gap-4 sm:gap-6">
+              <Figure className="h-auto w-20 shrink-0 sm:w-28 lg:w-36" />
+              <div className="min-w-[10rem] flex-1 [overflow-wrap:anywhere]">
+                <h3 className="text-2xl font-extrabold text-ink lg:text-[1.9rem]">{title}</h3>
+                <p className="mt-1 text-lg leading-relaxed text-ink-soft">{text}</p>
               </div>
             </li>
           ))}
@@ -292,12 +300,8 @@ export function Contacts({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   const wa = whatsappUrl();
   return (
-    <section id="contacts" aria-labelledby="contacts-title" className="relative overflow-clip bg-milk">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 -left-24 size-64 rounded-full bg-turquoise-soft/70 md:size-80"
-      />
-      <div className={`${container} relative grid items-start gap-8 py-12 sm:py-14 md:grid-cols-[1.4fr_0.6fr] lg:pt-16 lg:pb-18`}>
+    <section id="contacts" aria-labelledby="contacts-title" className="relative bg-milk">
+      <div className={`${container} grid items-end gap-8 py-12 sm:py-14 md:grid-cols-[minmax(0,1fr)_auto] lg:pt-16 lg:pb-18`}>
         <div className="min-w-0">
           <h2 id="contacts-title" className={h2Class}>
             {t.contacts.title}
@@ -360,12 +364,7 @@ export function Contacts({ locale }: { locale: Locale }) {
           <p className="mt-3 text-sm text-ink-soft">{t.contacts.mapHint}</p>
         </div>
 
-        <div aria-hidden="true" className="pointer-events-none hidden justify-center md:flex">
-          <div className="relative w-full max-w-[18rem]">
-            <div className="pegboard absolute inset-0 rounded-[2.5rem] bg-paper" />
-            <MosaicHouseSmall className="relative h-auto w-full p-6" />
-          </div>
-        </div>
+        <MapTrail className="pointer-events-none hidden h-auto w-56 md:block lg:mb-10 lg:w-64" />
       </div>
     </section>
   );

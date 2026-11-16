@@ -17,13 +17,17 @@ Next.js 16 (App Router) + TypeScript + Tailwind CSS 4. Статический с
 Пустая галерея и пустой список документов скрываются вместе с пунктами меню.
 Пути к файлам указываются с точным регистром и расширением.
 
+Подключено: `public/media/gallery/main-page.jpeg` — первый экран, `main-page2.jpeg` — «О садике»,
+`image1.jpeg`, `image2.jpeg`, `image3.jpeg` — галерея. Для фото доступны `position` (кадрирование),
+`positionDesktop` (отдельно для ноутбука) и `thumb: "tall" | "wide"` (форма миниатюры; по умолчанию — по пропорциям).
+
 ## Требует подтверждения заказчика
 
 - `site.instagramUrl` — передано «ma.zaika_ almaty», вероятно `@ma.zaika_almaty`; ссылка скрыта до подтверждения.
 - `site.map.twoGisUrl` — ссылка на карточку в 2ГИС; пока открывается поиск по адресу.
 - `site.whatsapp` — номер WhatsApp, если есть.
 - `site.siteUrl` — публичный домен (для canonical и hreflang).
-- Фотографии (main-page, main-page2, галерея) и логотип.
+- Логотип (пока название выводится текстом).
 
 ## Команды
 

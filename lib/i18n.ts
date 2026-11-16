@@ -54,9 +54,9 @@ const kk = {
   about: {
     title: "Біз туралы",
     lead: `Балабақшада ${site.groups} топ бар. Топтарға ${site.ageFrom} жастан ${site.ageTo} жасқа дейінгі балалар барады, тәрбие мен оқыту қазақ тілінде жүргізіледі.`,
-    groupsValue: `${site.groups} топ`,
+    groupsUnit: "топ",
     groupsLabel: "балабақшада",
-    ageValue: `${age} жас`,
+    ageUnit: "жас",
     ageLabel: "балалардың жасы",
     langValue: "Қазақ тілі",
     langLabel: "оқыту тілі",
@@ -147,9 +147,9 @@ const ru: Dictionary = {
   about: {
     title: "О садике",
     lead: `В садике ${site.groups} группы для детей от ${site.ageFrom} до ${site.ageTo} лет. Воспитание и обучение ведутся на казахском языке.`,
-    groupsValue: `${site.groups} группы`,
+    groupsUnit: "группы",
     groupsLabel: "в садике",
-    ageValue: `${age} лет`,
+    ageUnit: "лет",
     ageLabel: "возраст детей",
     langValue: "Казахский язык",
     langLabel: "язык обучения",

@@ -204,7 +204,7 @@ export function SiteHeader({ locale, nav }: { locale: Locale; nav: NavItem[] }) 
         {open && (
           <div
             id="mobile-menu"
-            className="menu-enter absolute inset-x-0 top-full max-h-[calc(100dvh-var(--header-h))] overflow-y-auto border-b border-line bg-paper pb-[max(1.25rem,env(safe-area-inset-bottom))] text-ink shadow-[0_18px_30px_-20px_rgb(29_34_48/0.35)]"
+            className="absolute inset-x-0 top-full max-h-[calc(100dvh-var(--header-h))] overflow-y-auto border-b border-line bg-paper pb-[max(1.25rem,env(safe-area-inset-bottom))] text-ink shadow-[0_18px_30px_-20px_rgb(29_34_48/0.35)]"
           >
             <nav aria-label={t.nav.label} className="mx-auto max-w-7xl px-4 pt-2 sm:px-6">
               <ul>

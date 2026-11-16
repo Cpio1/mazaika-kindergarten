@@ -5,16 +5,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import type { Photo } from "@/lib/media";
 import { ChevronIcon, CloseIcon } from "./icons";
+import { ShapeMark, mosaicColors } from "./Mosaic";
 
 const MOBILE_INITIAL = 4;
 const DESKTOP_INITIAL = 6;
-const corners = ["rounded-[1.5rem]", "rounded-[1.5rem] rounded-tr-[5rem]", "rounded-[1.5rem] rounded-bl-[5rem]"];
+/** Форма миниатюры: из настройки thumb или по исходным пропорциям снимка. */
+function shapeOf(p: Photo): "tall" | "wide" {
+  return p.thumb ?? (p.width >= p.height ? "wide" : "tall");
+}
 
-function gridCols(n: number) {
-  const mobile = n === 1 ? "grid-cols-1" : "grid-cols-2";
-  const desktop =
-    n === 1 ? "max-w-2xl" : n === 2 ? "md:grid-cols-2 lg:max-w-5xl" : n === 4 ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3";
-  return `${mobile} ${desktop}`;
+/** Вертикальные кадры — арка на две строки, горизонтальные — широкая плитка с одним скруглённым углом. */
+function tileClass(p: Photo, i: number, single: boolean) {
+  const tall = shapeOf(p) === "tall";
+  if (single) return tall ? "aspect-[3/4] max-w-sm rounded-t-full rounded-b-[1.5rem]" : "aspect-[4/3] max-w-2xl rounded-[1.5rem] rounded-tr-[5rem]";
+  if (tall) return "h-full rounded-t-full rounded-b-[1.25rem]";
+  return `h-full md:col-span-2 rounded-[1.25rem] ${i % 2 ? "rounded-bl-[4rem]" : "rounded-tr-[4rem]"}`;
 }
 
 export function Gallery({ locale, photos }: { locale: Locale; photos: Photo[] }) {
@@ -88,16 +93,23 @@ export function Gallery({ locale, photos }: { locale: Locale; photos: Photo[] })
   return (
     <section id="gallery" aria-labelledby="gallery-title" className="relative bg-milk">
       <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
-        <h2 id="gallery-title" className="text-[min(1.9rem,9vw)] leading-tight font-extrabold [overflow-wrap:anywhere] text-ink sm:text-4xl lg:text-[2.75rem]">
+        <h2 id="gallery-title" className="flex items-start gap-2 text-[min(1.9rem,9vw)] leading-tight font-extrabold [overflow-wrap:anywhere] text-ink sm:text-4xl lg:text-[2.75rem]">
           {t.gallery.title}
+          <ShapeMark shape="petal" color={mosaicColors.apricot} className="mt-0.5 size-5 shrink-0 sm:size-6" />
         </h2>
 
-        <ul className={`mt-6 grid gap-3 sm:gap-4 ${n === 1 ? "" : "lg:max-w-5xl"} ${gridCols(n)}`}>
+        <ul
+          className={
+            n === 1
+              ? "mt-6"
+              : "mt-6 grid max-w-3xl grid-flow-dense auto-rows-[9rem] grid-cols-2 gap-3 sm:auto-rows-[12rem] sm:gap-4 md:grid-cols-3 lg:auto-rows-[12.5rem]"
+          }
+        >
           {photos.map((p, i) => {
             const hidden =
               expanded || i < MOBILE_INITIAL ? "" : i < DESKTOP_INITIAL ? "hidden md:block" : "hidden";
             return (
-              <li key={p.src} className={hidden}>
+              <li key={p.src} className={`${hidden} ${n > 1 && shapeOf(p) === "tall" ? "row-span-2" : ""} ${n > 1 && shapeOf(p) === "wide" ? "md:col-span-2" : ""}`}>
                 <button
                   ref={(el) => {
                     thumbs.current[i] = el;
@@ -105,14 +117,14 @@ export function Gallery({ locale, photos }: { locale: Locale; photos: Photo[] })
                   type="button"
                   onClick={() => show(i)}
                   aria-label={`${t.gallery.open(i + 1)}: ${p.alt[locale]}`}
-                  className={`group relative block aspect-[4/3] w-full overflow-hidden bg-paper lg:aspect-[3/2] ${corners[i % corners.length]}`}
+                  className={`relative block w-full overflow-hidden bg-paper ${tileClass(p, i, n === 1)}`}
                 >
                   <Image
                     src={p.src}
                     alt=""
                     fill
-                    sizes="(min-width: 1024px) 340px, (min-width: 768px) 33vw, 50vw"
-                    className="object-cover transition-transform duration-200 group-hover:scale-[1.03]"
+                    sizes={shapeOf(p) === "wide" ? "(min-width: 768px) 512px, 50vw" : "(min-width: 768px) 256px, 50vw"}
+                    className="object-cover"
                     style={{ objectPosition: p.position ?? "50% 40%" }}
                   />
                 </button>
@@ -134,7 +146,7 @@ export function Gallery({ locale, photos }: { locale: Locale; photos: Photo[] })
 
       <dialog
         ref={dialogRef}
-        className="viewer viewer-enter"
+        className="viewer"
         aria-label={t.gallery.viewer}
         onCancel={(e) => {
           e.preventDefault();
