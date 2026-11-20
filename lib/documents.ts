@@ -18,5 +18,5 @@ export type DocumentItem = {
 export const documents: DocumentItem[] = [];
 
 /** Публичная ссылка на папку с документами (Google Drive и т. п.). */
-export const documentsFolderUrl: string | null = null;
+export const documentsFolderUrl: string | null = "https://drive.google.com/drive/folders/1zSwWsp5ZpbIFY491KqBNsxzdVjYVtu9B";
 
